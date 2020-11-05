@@ -17,6 +17,7 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from importlib import reload
 import test_objects
 reload(test_objects)
 from test_objects import *
@@ -49,7 +50,7 @@ class Common:
         pass
         s = "%s: %s: %s" % (self.__class__.__name__, type, data)
         if print_debug:
-            print s
+            print(s,end='') 
 ##        if s[:29]=="TestServer: process_string: [":
 ##            pdb.set_trace()
     
@@ -79,7 +80,8 @@ bclient.bridge.process_operation(atlas.Operation("talk",
 
 
 if print_debug:
-    print "="*60
+
+    print ("="*60)
 
 bserver.bridge.process_operation(atlas.Operation("sound",
                                                  atlas.Operation("talk",

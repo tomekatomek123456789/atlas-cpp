@@ -16,7 +16,7 @@
 #License along with this library; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-
+from importlib import reload
 import test_objects
 reload(test_objects)
 from test_objects import *
@@ -34,7 +34,7 @@ file_content = open("test.binary1").read()
 neg = NegotiationClient(["Binary1_beta"])
 assert(neg(file_content)=="found")
 if neg.str != gen_binary1(msg)[2:]: #reason for [2:]: drop list encoding from it
-    print "Binary1 encoding not same!"
+    print("Binary1 encoding not same!",end='')
 
 parse = get_parser()
 msg2 = parse(gen_binary1(msg)[2:])
@@ -42,5 +42,5 @@ file_content = open("test.binary1").read()
 neg = NegotiationClient(["Binary1_beta"])
 assert(neg(file_content)=="found")
 if neg.str != gen_binary1(msg2)[2:]:
-    print "Binary1 decoding and Binary1 encoding not same!"
+    print("Binary1 decoding and Binary1 encoding not same!", end='')
 

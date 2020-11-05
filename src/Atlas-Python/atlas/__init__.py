@@ -310,12 +310,12 @@ def get_last_part(id):
     
 
 def print_parents(obj):
-    print(obj.id, end='')
+    print(obj.id)
     o2 = obj
     if hasattr(o2, "parent"):
         o2 = o2.parent
         if hasattr(o2, "id"):
-            print("->", o2.id,end='')
+            print("->", o2.id)
         else:
-            print("->", o2,end='')
+            print("->", o2)
     print()

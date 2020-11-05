@@ -63,7 +63,7 @@ class GeoMap:
             
     def create_object(self, obj):
         #atlas.check_bug("add_object: %s:" % obj.id)
-        print "GeoMap:", 
+        print("GeoMap:", end='')
         atlas.print_parents(obj)
         #print obj.__class__
         #if hasattr(obj, "contains"):
@@ -71,10 +71,10 @@ class GeoMap:
         atlas.uri_type["loc"] = 1
         #atlas.uri_list_type["polyline"] = 1
         unresolved = self.resolve_attributes(obj)
-        print "GeoMap?:", unresolved
+        print("GeoMap?:", unresolved)
         #atlas.check_bug("add_object before resolve:")
         resolved_objects = self.resolver.new_object(obj)
-        print "GeoMap!:", map(lambda o:o.id, resolved_objects)
+        print("GeoMap!:", map(lambda o:o.id, resolved_objects))
         #atlas.check_bug("add_object before add_objects:")
         self.add_objects(resolved_objects, resolve_pointers=0)
         #atlas.check_bug("add_object done:")
@@ -172,10 +172,10 @@ class GeoMap:
 ##                        print "pos", obj.id, limits
 ##                        last_limits = deepcopy(limits)
             except ValueError:
-                print "="*60
-                print index
-                print "-"*60
-                print obj
+                print ("="*60)
+                print (index)
+                print ("-"*60)
+                print (obj)
         return limits.as_tuple()
             
 

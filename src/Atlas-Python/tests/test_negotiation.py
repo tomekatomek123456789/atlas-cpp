@@ -16,7 +16,7 @@
 #License along with this library; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-
+from importlib import reload
 from atlas.transport import negotiation
 reload(negotiation)
 from atlas.transport.negotiation import *
@@ -26,13 +26,13 @@ def stop(): import pdb; pdb.set_trace()
 
 def test(input, result="", result_str="", str="", codec=""):
     res = neg(input)
-    if result!=res: raise ValueError, "result: %s" % res
+    if result!=res: raise ValueError("result: %s" % res)
     send_str = neg.get_send_str()
     if result_str!=send_str:
-        raise ValueError, "send_str: %s" % send_str
-    if str!=neg.str: raise ValueError, "str: %s" % neg.str
+        raise ValueError("send_str: %s" % send_str)
+    if str!=neg.str: raise ValueError("str: %s" % neg.str)
     if codec!=neg.selected_codec:
-        raise ValueError, "codec: %s" % neg.selected_codec
+        raise ValueError("codec: %s" % neg.selected_codec)
 
 #server.....
 neg = NegotiationServer(["Packed", "XML"])

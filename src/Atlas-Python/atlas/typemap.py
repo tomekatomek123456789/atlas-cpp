@@ -25,7 +25,7 @@ FloatType = float
 DictType = dict
 StringType = str
 TupleType = tuple
-InstanceType = isinstance
+InstanceType = object
 _type2str = { IntType: "int",
              LongType: "int",
              FloatType: "float",

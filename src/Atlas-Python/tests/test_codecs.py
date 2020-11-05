@@ -116,7 +116,7 @@ for codec_id, file_extension in (("Bach_beta2", "bach"),
         assert(neg1(file_content)=="found")
         str1 = co.encode(msg)+co.encoder.close()
         if neg1.str != str1:
-            print codec_id + " encoding not same!"
+            print(codec_id + " encoding not same!",end='')
 
         msg2 = co.decode(str1)
         file_content = open(file_name).read()
@@ -124,7 +124,7 @@ for codec_id, file_extension in (("Bach_beta2", "bach"),
         assert(neg2(file_content)=="found")
         str2 = co.encode(msg2)+co.encoder.close()
         if neg2.str != str2:
-            print "%(codec_id)s decoding and %(codec_id)s encoding not same!" % locals()
+            print ("%(codec_id)s decoding and %(codec_id)s encoding not same!" % locals(),end='')
 
 
         assert(co.decoder.eos())
@@ -134,5 +134,5 @@ for codec_id, file_extension in (("Bach_beta2", "bach"),
         objects = read_file(file_name)
         assert(str(objects)==str(msg))
     except:
-        print "Exception testing codec", codec_id
+        print ("Exception testing codec", codec_id)
         raise

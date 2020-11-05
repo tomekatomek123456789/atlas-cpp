@@ -22,6 +22,9 @@ import sys
 sys.path.append("..")
 
 def deb(): import pdb; pdb.pm()
+
+def execfile(file):
+    exec(open(file).read())
 execfile("test_atlas.py")
 execfile("test_negotiation.py")
 #execfile("test_binary.py")

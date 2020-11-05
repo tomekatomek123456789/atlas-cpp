@@ -23,8 +23,8 @@ from distutils.core import setup
 
 setup(name="Atlas-Python",
 	version="0.3.0",
-	description="Python Atlas library",
-	author="Aloril",
+	description="Python3 Atlas library",
+	author="tomek89",
 	author_email="aloril@iki.fi",
 	url="http://www.worldforge.org/dev/eng/protocols/",
 	packages=['atlas', 'atlas.transport', 'atlas.transport.TCP', 'atlas.codecs', 'atlas.util'],
