@@ -3,7 +3,7 @@
 
 #Copyright 2002 by Michael Koch <konqueror@gmx.de>
 #Copyright 2002 by AIR-IX SUUNNITTELU/Ahiplan Oy
-
+#Copyright 2020 by Tomasz Kozioł <tomekatomek123456789@gmail.com>
 #This library is free software; you can redistribute it and/or
 #modify it under the terms of the GNU Lesser General Public
 #License as published by the Free Software Foundation; either
@@ -22,7 +22,7 @@
 from distutils.core import setup
 
 setup(name="Atlas-Python",
-	version="0.2.9",
+	version="0.3.0",
 	description="Python Atlas library",
 	author="Aloril",
 	author_email="aloril@iki.fi",

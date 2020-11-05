@@ -1,3 +1,4 @@
+TODO:
 - add debug transports/relays
 - make world_client: map_client + chat panel
 - stream vs once codec: binary* remain

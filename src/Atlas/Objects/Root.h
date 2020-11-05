@@ -3,6 +3,7 @@
 // Copyright 2000-2001 Stefanus Du Toit and Aloril.
 // Copyright 2001-2005 Alistair Riddoch.
 // Copyright 2011-2020 Erik Ogenvik.
+// Copyright 2020-2025 Tomasz Kozioł
 // Automatically generated using gen_cpp.py. Don't edit directly.
 
 #ifndef ATLAS_OBJECTS_ROOT_H

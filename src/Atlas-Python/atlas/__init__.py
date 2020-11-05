@@ -20,8 +20,8 @@
 #counter = 0
 import string
 from types import *
-from UserDict import UserDict
-from UserList import UserList
+from collections import UserDict
+from collections import UserList
 
 #from gen_xml import gen_xml
 from atlas.gen_bach import gen_bach
@@ -34,7 +34,7 @@ class Object(UserDict):
            acts like normal python class and dictionary at the same time
            in addition looks for atributes from parent objects
         """
-        if kw.has_key("from_"):
+        if "from_" in kw:
             kw["from"] = kw["from_"]
             del kw["from_"]
         UserDict.__init__(self, kw)
@@ -84,7 +84,7 @@ class Object(UserDict):
            and hasattr(parent, name):
             return getattr(parent, name)
         #print "raise AttributeError:", self.__class__, name
-        raise AttributeError, name
+        raise AttributeError(name)
 
     def is_plain_attribute(self, name):
         """is attribute plain?"""
@@ -164,7 +164,7 @@ class Object(UserDict):
         parent = self.__dict__.get("parent")
         if isinstance(parent, Object) and hasattr(parent, name):
             return parent.attribute_definition(name)
-        raise AttributeError, name
+        raise AttributeError(name)
 
     def has_parent(self, parent):
         if type(parent)!=StringType: parent = parent.id
@@ -295,7 +295,7 @@ def resolve_pointer2(base_dict, id):
         del id_lst[0]
         if not id_lst: return obj, id
         obj = obj[id]
-    raise KeyError, "empty id"
+    raise KeyError("empty id")
 
 def resolve_pointer(base_dict, id):
     obj, id = resolve_pointer2(base_dict, id)
@@ -310,12 +310,12 @@ def get_last_part(id):
     
 
 def print_parents(obj):
-    print obj.id,
+    print(obj.id, end='')
     o2 = obj
     if hasattr(o2, "parent"):
         o2 = o2.parent
         if hasattr(o2, "id"):
-            print "->", o2.id,
+            print("->", o2.id,end='')
         else:
-            print "->", o2,
-    print
+            print("->", o2,end='')
+    print()

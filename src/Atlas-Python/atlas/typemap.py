@@ -18,8 +18,15 @@
 
 
 from types import *
-
-_type2str = {IntType: "int",
+IntType = int
+ListType = list
+LongType = int
+FloatType = float
+DictType = dict
+StringType = str
+TupleType = tuple
+InstanceType = isinstance
+_type2str = { IntType: "int",
              LongType: "int",
              FloatType: "float",
              StringType: "string",

@@ -30,7 +30,7 @@
 #obj_list = codec.decode(some_string)
 
 import xml
-import xml2
+import xml2 
 import packed
 import binary1
 import binary2

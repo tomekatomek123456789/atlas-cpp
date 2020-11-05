@@ -31,7 +31,7 @@ def encode(value, indent=""):
 
 int_characters = "+-" + string.digits
 float_characters = ".eE" + int_characters
-plain_name_characters = string.digits + string.uppercase + string.lowercase + "_"
+plain_name_characters = string.digits + string.ascii_uppercase + string.ascii_lowercase + "_"
 string_quoted = '"\\'
 def encode_name(value):
     res = []
