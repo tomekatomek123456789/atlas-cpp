@@ -19,6 +19,7 @@
 
 from UserDict import UserDict
 from types import *
+import atlas.typesx
 import atlas
 
 class MediaInfo(UserDict):

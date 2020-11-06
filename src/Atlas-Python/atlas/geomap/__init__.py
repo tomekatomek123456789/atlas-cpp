@@ -18,6 +18,7 @@
 
 
 from types import *
+import atlas.typesx
 from atlas.geomap.Vector3D import Vector3D
 from atlas.geomap.object import MapObject
 import atlas

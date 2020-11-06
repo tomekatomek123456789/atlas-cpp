@@ -19,6 +19,7 @@
 
 
 import string
+from atlas.typesx import *
 from atlas.typemap import *
 
 #see bach.py for encoder

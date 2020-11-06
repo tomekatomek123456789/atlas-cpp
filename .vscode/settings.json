@@ -1,3 +1,4 @@
 {
-    "cmake.configureOnOpen": true
+    "cmake.configureOnOpen": true,
+    "python.pythonPath": "c:\\Users\\tomek\\AppData\\Local\\Programs\\Python\\Python39\\python.exe"
 }

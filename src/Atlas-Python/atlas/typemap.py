@@ -18,14 +18,9 @@
 
 
 from types import *
-IntType = int
-ListType = list
-LongType = int
-FloatType = float
-DictType = dict
-StringType = str
-TupleType = tuple
-InstanceType = object
+import inspect
+from atlas.typesx import *
+
 _type2str = { IntType: "int",
              LongType: "int",
              FloatType: "float",
@@ -36,7 +31,11 @@ _type2str = { IntType: "int",
              InstanceType: "?"}
 
 def get_atlas_type(value):
-    type_str = _type2str[type(value)]
+    print(".",end='')
+    if isinstance(value, InstanceType):
+        type_str="?"
+    else:
+        type_str = _type2str[type(value)]
     if type_str=="?":
         if hasattr(value, "items"): return "map"
         return "list"

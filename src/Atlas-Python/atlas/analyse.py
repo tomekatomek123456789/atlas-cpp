@@ -22,7 +22,7 @@ import string
 from types import *
 import atlas
 from atlas.typemap import get_atlas_type
-
+from atlas.typesx import *
 class Analyse:
     """fill attributes"""
     def __init__(self, objects):

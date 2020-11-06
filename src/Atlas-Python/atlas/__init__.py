@@ -20,8 +20,10 @@
 #counter = 0
 import string
 from types import *
+from atlas.typesx import *
 from collections import UserDict
 from collections import UserList
+from apply import apply
 
 #from gen_xml import gen_xml
 from atlas.gen_bach import gen_bach
@@ -131,7 +133,9 @@ class Object(UserDict):
         else:
             attrs = self.get_attributes(convert2plain_flag).items()
         if original_order:
-            attrs.sort(self.cmp_original_order)
+            #attrs = sort(self.cmp_original_order)
+            
+            attrs = sorted(attrs, key = self.cmp_original_order)
         return attrs
 
     def get_attributes(self, convert2plain_flag=1):
@@ -186,7 +190,9 @@ class Object(UserDict):
         add = string_list.append
         for (name, value) in self.get_attributes().items():
             add('%s = %s' % (name, repr(value)))
-        return "Object(%s)" % string.join(string_list,", ")
+        return "Object(%s)" % str.join(", ", string_list)
+        str.joi
+        
 
     def __str__(self):
         return gen_bach(self)
@@ -196,6 +202,7 @@ def Operation(parent, arg=Object(), **kw):
     kw["objtype"] = "op"
     kw["arg"] = arg
     return apply(Object, (), kw)
+    #return Object(*(), **kw)
 
 class Messages(UserList):
     """list of operations"""
@@ -226,7 +233,7 @@ def attribute_is_type(name, type):
     """is attribute of certain type somewhere in type hierarchy?"""
     if type=="uri" and uri_type.has_key(name):
         return 1
-    if type=="uri_list" and uri_list_type.has_key(name):
+    if type=="uri_list" and name in uri_list_type:
         return 1
 
 def is_plain(name, value):

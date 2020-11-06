@@ -19,6 +19,7 @@
 
 
 from types import *
+import atlas.typesx
 from xmllib import XMLParser
 import atlas
 import string
