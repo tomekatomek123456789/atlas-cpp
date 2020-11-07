@@ -47,9 +47,9 @@ def encode_name(value):
         if not ch in plain_name_characters:
             plain_flag = 0
     if plain_flag:
-        return string.join(res, "")
+        return str.join( "", res)
     else:
-        return '"%s"' % string.join(res, "")
+        return '"%s"' % str.join( "", res)
 
 def encode_string(value, indent):
     res = []
@@ -58,7 +58,7 @@ def encode_string(value, indent):
             res.append("\\" + ch)
         else:
             res.append(ch)
-    return '"%s"' % string.join(res, "")
+    return '"%s"' % str.join( "", res)
 
 ##def encode_map(obj, indent=""):
 ##    str_list = []
@@ -82,10 +82,10 @@ def encode_map(obj, indent=""):
             if str_type=="map":
                 if value: add_nl = 1
             elif str_type=="list":
-                if string.find(str_value, "\t")>=0: add_nl = 1
+                if str.find(str_value, "\t")>=0: add_nl = 1
             #if add_nl: str_value = "\n<a>%s<b>\n<c>%s<d>" % (str_value, indent)
             str_list.append("%s%s: %s" % (indent, str_name, str_value))
-    return "{\n%s\n%s}" % (string.join(str_list, ",\n"), indent[:-1])
+    return "{\n%s\n%s}" % (str.join( ",\n", str_list), indent[:-1])
 
 def encode_list(lst, indent=""):
     str_list = []
@@ -99,9 +99,9 @@ def encode_list(lst, indent=""):
             complex_in_list = 1
     if complex_in_list:
         str_list = map(lambda s,i=indent:"\n"+i+s, str_list)
-        res =  string.join(str_list,",") + "\n" + indent[:-1]
+        res =  str.join(",", str_list) + "\n" + indent[:-1]
     else:
-        res =  string.join(str_list,", ")
+        res =  str.join(", ", str_list)
     return "[%s]" % res
 
 def encode_int(value, indent=""):

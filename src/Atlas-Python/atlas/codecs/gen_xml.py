@@ -58,9 +58,9 @@ class GenerateXML:
     
     def to_string(self, value):
         if type(value)==StringType:
-            value = string.replace(value,"&","&amp;")
-            value = string.replace(value,"<","&lt;")
-            value = string.replace(value,">","&gt;")
+            value = value.replace("&","&amp;")
+            value = value.replace("<","&lt;")
+            value = value.replace(">","&gt;")
             return value
         elif type(value)==LongType:
             value = str(value)
@@ -92,13 +92,13 @@ class GenerateXML:
                         if str_value: add_nl = 1
                     elif str_type=="list":
                         str_value = self.list2xml(value, indent+"\t")
-                        if string.find(str_value, "\t")>=0: add_nl = 1
+                        if str_value.find("\t")>=0: add_nl = 1
                     else:
                         #int/float/string
                         str_value = self.to_string(value)
                     if add_nl: str_value = "\n%s\n%s" % (str_value, indent)
                 add_line(self.encode_attribute(indent, name, str_type, str_value))
-        return string.join(str_list, "\n")
+        return str.join("\n",str_list)
 
     def list2xml(self, lst, indent):
         str_list = []
@@ -119,6 +119,6 @@ class GenerateXML:
                 add_item("<%s>%s</%s>" % (str_type, self.to_string(item), str_type))
         if complex_in_list:
             str_list = map(lambda s,i=indent:i+s, str_list)
-            return string.join(str_list,"\n")
+            return str.join("\n",str_list)
         else:
-            return string.join(str_list,"")
+            return str.join("",str_list)

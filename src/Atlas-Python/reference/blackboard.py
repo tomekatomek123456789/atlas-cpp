@@ -24,6 +24,8 @@ import atlas.analyse
 from atlas.transport.TCP.client import TcpClient
 from atlas.transport.connection import args2address
 from types import *
+from atlas.typesx import *
+from apply import apply
 try:
     from wxPython.wx import *
 except ImportError:

@@ -35,6 +35,7 @@ import packed
 import binary1
 import binary2
 import bach
+from apply import apply
 
 class Codec:
     def __init__(self, id, decoder, encoder):

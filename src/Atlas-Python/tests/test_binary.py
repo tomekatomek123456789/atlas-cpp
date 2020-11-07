@@ -21,11 +21,11 @@ import test_objects
 reload(test_objects)
 from test_objects import *
 
-from atlas.codecs import binary1
+from ..atlas.codecs import binary1
 reload(binary1)
-from atlas.codecs.binary1 import *
+from ..atlas.codecs.binary1 import *
 
-from atlas.transport.negotiation import NegotiationClient
+from ..atlas.transport.negotiation import NegotiationClient
 
 #import pdb
 #pdb.set_trace()

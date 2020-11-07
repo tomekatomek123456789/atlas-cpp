@@ -733,7 +733,7 @@ class wxMapCanvas(wxGLCanvas,MapCanvas):
         pos = event.GetPosition()
         posx = pos.x / float(size.width)
         posy = (size.height - pos.y - 1) / float(size.height)
-        print size, pos, posx, posy
+        print (size, pos, posx, posy)
         return posx, posy
 
     def OnLeftMouseUp(self, event):

@@ -39,7 +39,7 @@ class DefParser:
                 continue
             if space_count>depth: #sub object
                 if last_obj==None:
-                    raise SyntaxError, ("Unexpected indentation",
+                    raise SyntaxError("Unexpected indentation",
                                         (self.filename, self.lineno, space_count, line))
                 self.parse_lines(lines, space_count, last_obj)
                 last_obj = None
@@ -66,14 +66,14 @@ class DefParser:
                 else:
                     type=""
             else:
-                raise SyntaxError, ("Unexpected element numbers (things delimited with ':')",
+                raise SyntaxError("Unexpected element numbers (things delimited with ':')",
                                     (self.filename, self.lineno, space_count, line))
             if type=="list": #new list subobject
                 if len(value):
                     try:
                         value=eval(value)
                     except:
-                        print "Error at:",(self.filename, self.lineno, line)
+                        print ("Error at:",(self.filename, self.lineno, line))
                         raise
                 else:
                     value = []
@@ -91,12 +91,13 @@ class DefParser:
                         self.lineno=self.lineno+1
                         line = lines[self.lineno]
                         value = value + line
-                        if not line or string.find(line,'"""')>=0:
+                        if not line or line.find('"""')>=0:
+                            
                             break
                 try:
                     value=eval(value)
                 except:
-                    print "Error at:",(self.filename, self.lineno, line)
+                    print ("Error at:",(self.filename, self.lineno, line))
                     raise
                 last_obj=None
             if name:
@@ -118,7 +119,7 @@ class DefParser:
 
     def syntax_error(self, msg, obj):
         info = obj.specification_file
-        raise SyntaxError, "%s at %s:%s" % (msg, info.filename, info.lineno)
+        raise SyntaxError("%s at %s:%s" % (msg, info.filename, info.lineno))
 
     def check_fill(self):
         """fill missing attributes and check for attribute definitions"""
@@ -135,7 +136,7 @@ class DefParser:
             except AttributeError:
                 self.syntax_error(
                     "Id attribute is not specified for object", obj)
-            if self.id_dict.has_key(id):
+            if id in self.id_dict:
                 self.syntax_error(
                     'Object with "'+id+'"-id already exists', obj)
             self.id_dict[id]=obj

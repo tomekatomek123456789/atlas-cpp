@@ -18,8 +18,10 @@
 
 import atlas
 import string
+from xml.etree.ElementTree import XMLParser
+from apply import apply
 
-class BaseEncoder:
+class BaseEncoder(XMLParser):
     def __init__(self, stream_flag=None):
         self.set_stream_mode(stream_flag)
     def set_stream_mode(self, mode=1):
@@ -31,7 +33,7 @@ class BaseEncoder:
                 slst = []
                 for obj in object:
                     slst.append(self(obj))
-                return string.join(slst, "")
+                return str.join( "", slst)
             str = self.encode1stream(object)
             if self.stream_begin_sent:
                 str = self.middle_string + str

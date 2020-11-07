@@ -102,8 +102,9 @@ class BachParser(decoder.BaseDecoder):
             c.excepted_value = "map_name"
         elif c.excepted_value == "list_value":
             if type(obj)!=ListType:
-                raise BachException("object not inside list (%s)!" % value
-            obj.append(value))
+                raise BachException("object not inside list (%s)!" % value)
+            obj.append(value)
+            
         else:
             raise BachException("unknown container (%s)!" % value)
         self.mode = self.skip_white_space
@@ -172,7 +173,7 @@ class BachParser(decoder.BaseDecoder):
             try:
                 c.value = int(c.value)
             except ValueError:
-                c.value = long(c.value)
+                c.value = int(c.value)
             self.add_value()
             self.get_next_mode(ch)
 

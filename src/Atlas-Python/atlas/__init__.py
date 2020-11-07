@@ -23,6 +23,7 @@ from types import *
 from atlas.typesx import *
 from collections import UserDict
 from collections import UserList
+from functools import cmp_to_key
 from apply import apply
 
 #from gen_xml import gen_xml
@@ -63,17 +64,17 @@ class Object(UserDict):
             return getattr(self,name[:-1])
         if name=="data": return self.__dict__
         #print "before __dict__:", self.__class__, name
-        if self.__dict__.has_key(name):
+        if name in self.__dict__:
             return self.__dict__[name]
         #print "before __class__.__dict__:", self.__class__, name
-        if self.__class__.__dict__.has_key(name):
+        if name in self.__class__.__dict__:
             return self.__class__.__dict__[name]
         #print "before parent:", self.__class__, name
         parent = None
         if self.__dict__.has_key("parent"):
         #    print "getting parent_list from __dict__"
             parent = self.__dict__["parent"]
-        elif self.__class__.__dict__.has_key("parent"):
+        elif "parent" in self.__class__.__dict__:
         #    print "getting parent_list from __class__.__dict__"
             parent = self.__class__.__dict__["parent"]
 
@@ -120,6 +121,7 @@ class Object(UserDict):
         if a_pos==b_pos:
             return cmp(a[0], b[0])
         return cmp(a_pos, b_pos)
+        
 
     def items(self, convert2plain_flag=1, original_order=1,
               all=0): 
@@ -133,9 +135,10 @@ class Object(UserDict):
         else:
             attrs = self.get_attributes(convert2plain_flag).items()
         if original_order:
-            #attrs = sort(self.cmp_original_order)
+
+            #attrs.sort(self.cmp_original_order)
             
-            attrs = sorted(attrs, key = self.cmp_original_order)
+            attrs = sorted(attrs, key = cmp_to_key(self.cmp_original_order))
         return attrs
 
     def get_attributes(self, convert2plain_flag=1):
@@ -191,7 +194,7 @@ class Object(UserDict):
         for (name, value) in self.get_attributes().items():
             add('%s = %s' % (name, repr(value)))
         return "Object(%s)" % str.join(", ", string_list)
-        str.joi
+        #str.joi
         
 
     def __str__(self):
@@ -219,7 +222,7 @@ class Messages(UserList):
 #        return string.join(map(str,self.data),"\n")
 
 def class_inherited_from_Object(cl):
-    if type(cl)!=ClassType:
+    if type(cl)!= issubclass(cl, object):
         return 0
     if cl==Object: return 1
     for base in cl.__bases__:
@@ -231,7 +234,7 @@ uri_type = {"from":1, "to":1}
 uri_list_type = {"parent":1, "children":1}
 def attribute_is_type(name, type):
     """is attribute of certain type somewhere in type hierarchy?"""
-    if type=="uri" and uri_type.has_key(name):
+    if type=="uri" and name in uri_type:
         return 1
     if type=="uri_list" and name in uri_list_type:
         return 1
@@ -292,7 +295,7 @@ def make_object_from_dict(dict):
 
 
 def resolve_pointer2(base_dict, id):
-    id_lst = string.split(id, ".")
+    id_lst = str.split(id,".")
     obj = base_dict
     while id_lst:
         if type(obj)==ListType:
@@ -310,10 +313,10 @@ def resolve_pointer(base_dict, id):
 
 
 def get_base_id(id):
-    return string.split(id, ".")[0]
+    return str.split(id,".")[0]
 
 def get_last_part(id):
-    return string.split(id, ".")[-1]
+    return str.split(id, ".")[-1]
     
 
 def print_parents(obj):
