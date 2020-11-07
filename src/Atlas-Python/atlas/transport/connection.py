@@ -57,9 +57,9 @@ class BaseConnection:
         self.send_operation(reply_op)
 
     def error_op(self, op):
-        print ("Got error operation (override method from connection.py")
-        print ("to define your own error handling: this is here so you don't")
-        print ("accidentally echo error operations back and potentially form a loop):")
+        print "Got error operation (override method from connection.py"
+        print "to define your own error handling: this is here so you don't"
+        print "accidentally echo error operations back and potentially form a loop):"
         print op
 
     def send_error(self, op, msg):

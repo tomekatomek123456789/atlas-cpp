@@ -18,7 +18,6 @@
 
 
 from types import * #for TypeXXX
-import atlas.typesx #for TypeXXX in python 3
 from operator import * #for add, etc..
 from math import *
 

@@ -71,7 +71,7 @@ class SocketServer(BaseServer):
         if ready_in and ready_in[0]==self.socket:
             ready_in = ready_in[1:]
             new_client = self.client_factory(self, self.socket.accept())
-            print ("Connected:", new_client.id)
+            print "Connected:", new_client.id
             self.clients.append(new_client)
             debug("New connection: fileno(): %s, addr: %s" % (new_client.fileno(), new_client.addr))
             #print "getpeername():", new_client.fd.getpeername()

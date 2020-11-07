@@ -18,11 +18,8 @@
 
 
 import atlas
-from xml.etree.ElementTree import XMLParser
-from apply import apply
 
-class BaseDecoder(XMLParser):
-    
+class BaseDecoder:
     def setup(self, stream_flag=None):
         self.data = ""
         self.msgList = []

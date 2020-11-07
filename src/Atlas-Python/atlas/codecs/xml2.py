@@ -19,6 +19,7 @@
 
 import string
 from atlas.typemap import *
+
 import gen_xml, parse_xml
 
 def gen_xml2(obj):
@@ -102,14 +103,14 @@ class XML2Parser(parse_xml.AtlasParser):
             method = getattr(self, method_name)
             attributes["name"] = tag
             return method(attributes)
-        raise XmlException2( "Unknown tag: "+tag)
+        raise XmlException, "Unknown tag: "+tag
 
     def unknown_endtag(self, tag):
         method_name = "end_" + attribute_type_dict.get(tag, "")
         if hasattr(self, method_name):
             method = getattr(self, method_name)
             return method()
-        raise XmlException2("Unknown tag: " +tag)
+        raise XmlException, "Unknown tag: "+tag
 
     
 def get_parser():

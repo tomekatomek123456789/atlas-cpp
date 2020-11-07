@@ -20,7 +20,3 @@ Licensing:
 See COPYING.LGPL and COPYING.GPL for licenses.
 
 See top of file to see which license is used.
-
-Dependency:
------------
-Python require package future, please: pip install future

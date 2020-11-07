@@ -19,7 +19,6 @@
 
 from UserDict import UserDict
 from types import *
-import atlas.typesx
 import atlas
 
 class MediaInfo(UserDict):
@@ -36,29 +35,29 @@ class MediaInfo(UserDict):
         for obj in objects:
             if hasattr(obj, "filter") and hasattr(obj.filter, "id"):
                 lst = self.get(obj.filter.id, [])
-                print ("<<<filter>>>", obj.id, obj.filter.id, len(lst),end='')
+                print "<<<filter>>>", obj.id, obj.filter.id, len(lst),
                 lst.append(obj)
                 self[obj.filter.id] = lst
-                print("->", len(lst))
+                print "->", len(lst)
             else:
-                print ("[[[itself]]]", obj.id,end='')
+                print "[[[itself]]]", obj.id,
                 if type(self.get(obj.id))==ListType:
-                    print("not used")
+                    print "not used"
                 else:
-                    print("used")
+                    print "used"
                     self[obj.id] = obj
         
     def create_object(self, obj):
-        print("MediaInfo:",end='')
+        print "MediaInfo:",
         atlas.print_parents(obj)
         #print obj.__class__
         atlas.uri_type["texture_source"] = 1
         unresolved = []
         for attr in ["texture_source", "media_groups"]:
             unresolved = unresolved + self.resolver.resolve_attribute(obj, attr)
-        print("MediaInfo?:", unresolved)
+        print "MediaInfo?:", unresolved
         resolved_objects = self.resolver.new_object(obj)
-        print("MediaInfo!:", map(lambda o:o.id, resolved_objects))
+        print "MediaInfo!:", map(lambda o:o.id, resolved_objects)
         self.add_objects(resolved_objects)
         #print self.resolver.pending
         #print "info:", self.resolver.depencies

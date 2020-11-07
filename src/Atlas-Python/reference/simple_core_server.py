@@ -45,12 +45,12 @@ class SimpleCoreServer(SocketServer):
             for obj in self.objects.values():
                 if obj.has_parent("world") and obj.id!="world":
                     self.worlds.append(obj)
-                    print( obj)
-            print (len(self.objects), "objects loaded in", len(self.worlds), "worlds")
+                    print obj
+            print len(self.objects), "objects loaded in", len(self.worlds), "worlds"
         except IOError:
-            print ("no %s, starting empty" % file_name)
-            print ('do "python3 gen_simple_core.py" to generate example meadow file')
-            print ("or get it from http://purple.worldforge.org/~aloril/atlas/simple_core.atlas")
+            print "no %s, starting empty" % file_name
+            print 'do "python2 gen_simple_core.py" to generate example meadow file'
+            print "or get it from http://purple.worldforge.org/~aloril/atlas/simple_core.atlas"
             self.objects = {}
         self.save_no = 0
         self.save()
@@ -64,13 +64,13 @@ class SimpleCoreServer(SocketServer):
         return
         name = save_file_name % self.save_no
         write_file(self.objects.values(), name)
-        print ("Wrote", name)
+        print "Wrote", name
         self.save_no = self.save_no + 1
 
     def next_id(self):
         i = 0
         while self.objects.has_key(str(i)): i = i + 1
-        return ("a"+str(i))
+        return "a"+str(i)
 
     def check_bidirectional(self, obj, op="create"):
         if not obj: return

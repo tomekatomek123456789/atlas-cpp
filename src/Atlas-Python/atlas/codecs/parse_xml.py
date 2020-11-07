@@ -19,13 +19,11 @@
 
 
 from types import *
-from atlas.typesx import *
-from xml.etree.ElementTree import XMLParser
+from xmllib import XMLParser
 import atlas
-#from parse import parse
 import string
 import decoder
-from binary1 import get_parser
+
 """
 usage:
 parseXML=get_parser()
@@ -40,7 +38,7 @@ when several clients connect)
 
 class XmlException(Exception): pass
 
-class AtlasParser(XMLParser,decode.BaseDecoder):
+class AtlasParser(XMLParser,decoder.BaseDecoder):
     def setup(self, stream_flag=None):
         """uses tree that start from root_obj, current route to leave
            is kept in obj_stack"""
@@ -84,7 +82,7 @@ class AtlasParser(XMLParser,decode.BaseDecoder):
                self.obj_stack == [[]]
 
     def unknown_starttag(self, tag, attributes):
-        raise XmlException("Unknown tag: "+tag)
+        raise XmlException, "Unknown tag: "+tag
 
     def handle_data(self, data):
         """#PCDATA (actual string,int,float,uri content)"""
@@ -108,12 +106,12 @@ class AtlasParser(XMLParser,decode.BaseDecoder):
         del self.name_stack[-1]
         if name:
             if not isinstance(obj,atlas.Object):
-                raise XmlException("attribute outside mapping (%s:%s)!" % \
-                      (name, value))
+                raise XmlException, "attribute outside mapping (%s:%s)!" % \
+                      (name, value)
             setattr(obj, name, value)
         else:
             if type(obj)!=ListType:
-                raise XmlException("value mapping list (%s)!" % value)
+                raise XmlException, "value mapping list (%s)!" % value
             obj.append(value)
 
     def push_value(self, attributes, initial_value):
@@ -139,7 +137,7 @@ class AtlasParser(XMLParser,decode.BaseDecoder):
         try:
             value = int(self.data)
         except ValueError:
-            value = int(self.data)
+            value = long(self.data)
         self.end_value(value)
 
     def start_float(self, attributes):

@@ -18,10 +18,8 @@
 
 
 from types import *
-import inspect
-from atlas.typesx import *
 
-_type2str = { IntType: "int",
+_type2str = {IntType: "int",
              LongType: "int",
              FloatType: "float",
              StringType: "string",
@@ -31,11 +29,7 @@ _type2str = { IntType: "int",
              InstanceType: "?"}
 
 def get_atlas_type(value):
-    print(".",end='')
-    if isinstance(value, InstanceType):
-        type_str="?"
-    else:
-        type_str = _type2str[type(value)]
+    type_str = _type2str[type(value)]
     if type_str=="?":
         if hasattr(value, "items"): return "map"
         return "list"

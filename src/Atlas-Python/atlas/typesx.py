@@ -16,3 +16,7 @@ def cmp(x, y):
     """
 
     return (x > y) - (x < y)
+
+
+def div(a, b):
+    return a/b

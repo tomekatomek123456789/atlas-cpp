@@ -99,7 +99,7 @@ class Negotiation:
         return self.result_code
 
     def process_line(self, line):
-        raise AttributeError("User NegotiationClient or NegotiationServer instead")
+        raise AttributeError, "User NegotiationClient or NegotiationServer instead"
 
     def collect_until_newline(self):
         if self.fp:

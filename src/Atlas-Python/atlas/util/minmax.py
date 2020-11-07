@@ -54,7 +54,7 @@ class MinMax:
         elif new_size:
             expand_size = (new_size - self.size())/2.0
         else:
-            raise ValueError("give either percentage or new_size")
+            raise ValueError, "give either percentage or new_size"
         self.min = self.min - expand_size
         self.max = self.max + expand_size
 

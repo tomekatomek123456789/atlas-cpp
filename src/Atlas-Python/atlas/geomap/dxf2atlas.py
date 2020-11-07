@@ -205,7 +205,7 @@ class ReadDxf:
 
     def process_layer(self, name, color=None):
         if detailed_debug:
-            print ("LAYER", name, color)
+            print "LAYER", name, color
         if not self.layers.has_key(name):
             self.layers[name] = Layer()
             self.layers[name].name = name
@@ -216,18 +216,18 @@ class ReadDxf:
 
     def process_polyline(self, closed=0):
         if detailed_debug:
-            print ("POLYLINE")
+            print "POLYLINE"
         self.ent = Polyline(closed)
         self.add(self.ent)
 
     def process_vertex(self, x, y, z):
         if detailed_debug:
-            print ("VERTEX", x, y, z)
+            print "VERTEX", x, y, z
         self.ent.points.append([x, y, z])
 
     def process_line(self, x1, y1, z1, x2, y2, z2):
         if detailed_debug:
-            print ("LINE", x1, y1, z1, x2, y2, z2)
+            print "LINE", x1, y1, z1, x2, y2, z2
         ent = Polyline()
         self.add(ent)
         ent.points.append([x1, y1, z1])
@@ -235,7 +235,7 @@ class ReadDxf:
 
     def process_text(self, x, y, z, text, rotation, xscale):
         if detailed_debug:
-            print ("TEXT", x, y, z, repr(text), rotation, xscale)
+            print "TEXT", x, y, z, repr(text), rotation, xscale
         ent = Text((x, y, z), rotation, text)
         self.add(ent)
         for c in text:
@@ -274,18 +274,18 @@ class ReadDxf:
         elif ent=="BLOCK":
             self.block_name = g[2]
             if detailed_debug:
-                print ("BLOCK", self.block_name, "...")
+                print "BLOCK", self.block_name, "..."
             if self.blocks.has_key(self.block_name): raise ValueError ("block already defined", self.block_name)
             self.blocks[self.block_name] = []
             self.add = self.blocks[self.block_name].append
         elif ent=="ENDBLK":
             self.block_name = ""
             if detailed_debug:
-                print ("... BLOCK")
+                print "... BLOCK"
         elif ent=="INSERT":
             name = g[2]
             if detailed_debug:
-                print ("INSERT", name)
+                print "INSERT", name
             angle = acad_angle2float(g.get(50, "0.0"))
             if self.blocks.has_key(name):
                 block = self.blocks[name]
@@ -311,12 +311,12 @@ class ReadDxf:
         for layer in layer_lst:
             xlimit, ylimit = self.layers[layer].limits()
             total += len(self.layers[layer])
-            print(layer, len(self.layers[layer]))
-            print(xlimit, ylimit)
-            print()
+            print layer, len(self.layers[layer])
+            print xlimit, ylimit
+            print
             if xlimit.min<1000000: del self.layers[layer]
-        print("all:", total)
-        print(self.text_count)
+        print "all:", total
+        print self.text_count
 
     def write(self, file, media_file):
         atlas.uri_type["loc"] = 1
@@ -368,7 +368,7 @@ def dxf2atlas(infile, outfile, outfile_media=None):
         outfile_media = string.join(string.split(outfile, ".", 2), "_media.")
         if outfile==outfile_media:
             raise ValueError, "outfile==outfile_media: %s" % outfile_media
-    print(infile, "->", outfile, outfile_media)
+    print infile, "->", outfile, outfile_media
     dxf = ReadDxf(infile)
     dxf.read()
     dxf.write(outfile, outfile_media)

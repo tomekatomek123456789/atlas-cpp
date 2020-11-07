@@ -26,7 +26,7 @@ import atlas
 class HelloWorldClient(TcpClient):
     def sound_op(self, op):
         talk_op = op.arg
-        print("%s said %s" % (op.from_, talk_op.arg.say))
+        print "%s said %s" % (op.from_, talk_op.arg.say)
 
 if __name__=="__main__":
     s = HelloWorldClient("Hello World client", args2address(sys.argv))
