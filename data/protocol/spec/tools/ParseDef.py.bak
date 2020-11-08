@@ -1,14 +1,10 @@
-from __future__ import print_function
-from builtins import str
-from builtins import object
 import string,re
 from types import *
-from atlas import typesx
 
 data_type=["string", "int", "float", 
            "list", "map"]
 
-class Object(object):
+class Object:
     def __init__(self, name="", type="", value=""):
         self.name=name
         self.type=type
@@ -24,8 +20,8 @@ class Object(object):
         if value.name:
             self.attr[value.name]=value
             self.attr_list.append(value)
-        if (value.name=="id" and "parent" in self.attr) or \
-           (value.name=="parent" and "id" in self.attr):
+        if (value.name=="id" and self.attr.has_key("parent")) or \
+           (value.name=="parent" and self.attr.has_key("id")):
             self.append(Object(name="children",value=[]))
     def append_inherited(self, value):
         self.attr[value.name]=value
@@ -33,11 +29,11 @@ class Object(object):
     def add_children(self, obj):
         inst_obj=self.attr.get("children")
         if not inst_obj: #checked earlier
-            raise SyntaxError("id attribute not defined and thus children neither",
+            raise SyntaxError, ("id attribute not defined and thus children neither",
                                 self.debug)
         id=obj.attr.get("id")
         if not id: #checked earlier
-            raise SyntaxError("id attribute not defined",
+            raise SyntaxError, ("id attribute not defined",
                                 obj.debug)
         inst_obj.value.append(id.value)
     def has_parent(self, dict, id):
@@ -56,7 +52,7 @@ class Object(object):
         return self.name+":"+self.type+":"+str(self.value)
 
 debug_reading=0
-class ParseDef(object):
+class ParseDef:
     """reads 'atlas def' files and created suitable 'web' for html/xml generators"""
     def __init__(self):
         self.id_dict={}
@@ -71,12 +67,12 @@ class ParseDef(object):
                 line=line0
                 line0=None
                 if debug_reading:
-                    print("???",line,self.lineno)
+                    print "???",line,self.lineno
             else:
                 line=fp.readline()
                 self.lineno=self.lineno+1
                 if debug_reading:
-                    print("!!!",self.lineno,line, end=' ')
+                    print "!!!",self.lineno,line,
             if not line: break
             if line[0] in '#\n': continue
             space_count=len(re.match("( *)",line).group(1))
@@ -84,7 +80,7 @@ class ParseDef(object):
             #print " "*depth,depth,space_count,"{",line[:-1],"}",parent_obj
             if space_count>depth: #sub object
                 if not last_obj:
-                    raise SyntaxError("Unexpected indentation",
+                    raise SyntaxError, ("Unexpected indentation",
                                         (self.filename, self.lineno, space_count, line))
                 #current line belongs to sub object, lets call ourself
                 #it returns next line from our object
@@ -114,7 +110,7 @@ class ParseDef(object):
                 else:
                     type=""
             else:
-                raise SyntaxError("Unexpected element numbers (things delimited with ':')",
+                raise SyntaxError, ("Unexpected element numbers (things delimited with ':')",
                                     (self.filename, self.lineno, space_count, line))
             if type in ["list", "map"]: #new subojects
                 obj=last_obj=Object(name,type,value=[])
@@ -126,12 +122,12 @@ class ParseDef(object):
                         line=fp.readline()
                         self.lineno=self.lineno+1
                         value=value+line
-                        if not line or typesx.find(line,'"""')>=0:
+                        if not line or string.find(line,'"""')>=0:
                             break
                 try:
                     evaled_value=eval(value)
                 except:
-                    print("Error at:",(self.filename, self.lineno, space_count, line))
+                    print "Error at:",(self.filename, self.lineno, space_count, line)
                     raise
                 obj=Object(name,type,evaled_value)
                 last_obj=None
@@ -157,37 +153,37 @@ class ParseDef(object):
                     id=obj2.value
                     break
             if not id:
-                raise SyntaxError("Id attribute is not specified for object",obj.debug)
-            if id in self.id_dict:
-                raise SyntaxError('Object with "'+id+'"-id already exists',obj.debug)
+                raise SyntaxError, ("Id attribute is not specified for object",obj.debug)
+            if self.id_dict.has_key(id):
+                raise SyntaxError, ('Object with "'+id+'"-id already exists',obj.debug)
             self.id_dict[id]=obj
     def search_type(self, name):
         """find type for this name"""
         if name in data_type: return name
         obj=self.id_dict[name]
-        if 'parent' not in obj.attr:
-            raise SyntaxError("Parent attribute is not specified for object",obj.debug)
+        if not obj.attr.has_key('parent'):
+            raise SyntaxError, ("Parent attribute is not specified for object",obj.debug)
         parent=obj.attr['parent'].value
         if not parent:
-            raise SyntaxError("Didn't found data_type for object",obj.debug)
+            raise SyntaxError, ("Didn't found data_type for object",obj.debug)
         return self.search_type(parent)
     def fill_type_object(self, obj):
         """recursively find types for all objects"""
-        if type(obj)!=typesx.InstanceType: return
+        if type(obj)!=InstanceType: return
         if obj.name:
-            if obj.name not in self.id_dict:
-                raise SyntaxError('Name "'+obj.name+'" is not specified',obj.debug)
+            if not self.id_dict.has_key(obj.name):
+                raise SyntaxError, ('Name "'+obj.name+'" is not specified',obj.debug)
             obj.type=self.search_type(obj.name)
-        if type(obj.value)==typesx.ListType:
+        if type(obj.value)==ListType:
             for sub_obj in obj.value:
                 self.fill_type_object(sub_obj)
     def fill_type(self):
         self.fill_type_object(self.objects)
     def fill_inherited_attributes_object(self, obj, p_obj,depth):
         """recursively find attributes that are inherited from parents"""
-        if type(obj)!=typesx.InstanceType: return
-        if 'parent' not in p_obj.attr:
-            raise SyntaxError("Parent attribute is not specified for object",
+        if type(obj)!=InstanceType: return
+        if not p_obj.attr.has_key('parent'):
+            raise SyntaxError, ("Parent attribute is not specified for object",
                                 p_obj.debug)
         if depth==1:
             p_obj.add_children(obj)
@@ -195,11 +191,11 @@ class ParseDef(object):
         for p_sub_obj in p_obj.value:
             name=p_sub_obj.name
             #print "-->",p_sub_obj.name
-            if p_sub_obj.name not in obj.attr:
+            if not obj.attr.has_key(p_sub_obj.name):
                 obj.append_inherited(p_sub_obj)
         parent = p_obj.attr['parent'].value
-        if parent not in self.id_dict:
-            raise SyntaxError("Parent \""+parent+"\" doesn't exist.",
+        if not self.id_dict.has_key(parent):
+            raise SyntaxError, ("Parent \""+parent+"\" doesn't exist.",
                                 obj.attr['parent'].debug)
         self.fill_inherited_attributes_object(obj,self.id_dict[parent],depth+1)
     def fill_inherited_attributes(self):

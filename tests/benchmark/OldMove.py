@@ -43,4 +43,4 @@ for i in range(maxi):
     res_sight = npc1.move(move)
     x,y,z = res_sight[0][0].location.coordinates
 time_off("NPC movements", maxi)
-print "Resulting position: (%s,%s,%s)" % (x,y,z)
+print ("Resulting position: (%s,%s,%s)" % (x,y,z))

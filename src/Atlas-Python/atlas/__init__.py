@@ -1,3 +1,4 @@
+from __future__ import print_function
 #atlas objects
 
 #Copyright 2000-2002 by Aloril
@@ -18,10 +19,16 @@
 
 
 #counter = 0
+from past.builtins import cmp
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from future.utils import raise_
 import string
 from types import *
-from UserDict import UserDict
-from UserList import UserList
+from collections import UserDict
+from collections import UserList
+from . import typesx
 
 #from gen_xml import gen_xml
 from atlas.gen_bach import gen_bach
@@ -34,7 +41,7 @@ class Object(UserDict):
            acts like normal python class and dictionary at the same time
            in addition looks for atributes from parent objects
         """
-        if kw.has_key("from_"):
+        if "from_" in kw:
             kw["from"] = kw["from_"]
             del kw["from_"]
         UserDict.__init__(self, kw)
@@ -61,17 +68,17 @@ class Object(UserDict):
             return getattr(self,name[:-1])
         if name=="data": return self.__dict__
         #print "before __dict__:", self.__class__, name
-        if self.__dict__.has_key(name):
+        if name in self.__dict__:
             return self.__dict__[name]
         #print "before __class__.__dict__:", self.__class__, name
-        if self.__class__.__dict__.has_key(name):
+        if name in self.__class__.__dict__:
             return self.__class__.__dict__[name]
         #print "before parent:", self.__class__, name
         parent = None
-        if self.__dict__.has_key("parent"):
+        if "parent" in self.__dict__:
         #    print "getting parent_list from __dict__"
             parent = self.__dict__["parent"]
-        elif self.__class__.__dict__.has_key("parent"):
+        elif "parent" in self.__class__.__dict__:
         #    print "getting parent_list from __class__.__dict__"
             parent = self.__class__.__dict__["parent"]
 
@@ -84,7 +91,7 @@ class Object(UserDict):
            and hasattr(parent, name):
             return getattr(parent, name)
         #print "raise AttributeError:", self.__class__, name
-        raise AttributeError, name
+        raise_(AttributeError, name)
 
     def is_plain_attribute(self, name):
         """is attribute plain?"""
@@ -126,10 +133,10 @@ class Object(UserDict):
            all: list also inherited attributes (if possible)
         """
         if all:
-            attrs = self.get_all_attributes(
-                convert2plain_flag=convert2plain_flag).items()
+            attrs = list(self.get_all_attributes(
+                convert2plain_flag=convert2plain_flag).items())
         else:
-            attrs = self.get_attributes(convert2plain_flag).items()
+            attrs = list(self.get_attributes(convert2plain_flag).items())
         if original_order:
             attrs.sort(self.cmp_original_order)
         return attrs
@@ -139,7 +146,7 @@ class Object(UserDict):
            returns dictionary: use items() for list"""
         if convert2plain_flag:
             res_dict = {}
-            for name, value in self.__dict__.items():
+            for name, value in list(self.__dict__.items()):
                 if name[0]=="_": continue
                 res_dict[name] = convert2plain(name, value)
             return res_dict
@@ -159,15 +166,15 @@ class Object(UserDict):
 
     def attribute_definition(self, name):
         """give object that defines given attribute"""
-        if self.__dict__.has_key(name):
+        if name in self.__dict__:
             return self
         parent = self.__dict__.get("parent")
         if isinstance(parent, Object) and hasattr(parent, name):
             return parent.attribute_definition(name)
-        raise AttributeError, name
+        raise_(AttributeError, name)
 
     def has_parent(self, parent):
-        if type(parent)!=StringType: parent = parent.id
+        if type(parent)!=typesx.StringType: parent = parent.id
         if self.id == parent: return 1
         parent_obj = self.__dict__.get("parent")
         if isinstance(parent_obj, Object) and \
@@ -184,9 +191,9 @@ class Object(UserDict):
     def __repr__(self): 
         string_list = []
         add = string_list.append
-        for (name, value) in self.get_attributes().items():
+        for (name, value) in list(self.get_attributes().items()):
             add('%s = %s' % (name, repr(value)))
-        return "Object(%s)" % string.join(string_list,", ")
+        return "Object(%s)" % typesx.join(string_list,", ")
 
     def __str__(self):
         return gen_bach(self)
@@ -195,13 +202,13 @@ def Operation(parent, arg=Object(), **kw):
     kw["parent"] = parent
     kw["objtype"] = "op"
     kw["arg"] = arg
-    return apply(Object, (), kw)
+    return Object(*(), **kw)
 
 class Messages(UserList):
     """list of operations"""
     def __init__(self, *args):
         #print args, len(args), isinstance(args[0], Messages), type(args[0])
-        if len(args)==1 and (isinstance(args[0], UserList) or type(args[0])==ListType):
+        if len(args)==1 and (isinstance(args[0], UserList) or type(args[0])==typesx.ListType):
             UserList.__init__(self, args[0])
         else:
             UserList.__init__(self, list(args))
@@ -212,7 +219,8 @@ class Messages(UserList):
 #        return string.join(map(str,self.data),"\n")
 
 def class_inherited_from_Object(cl):
-    if type(cl)!=ClassType:
+    #TODO: if type(cl)!=typesx.ClassType:
+    if type(cl) != issubclass(cl, object):
         return 0
     if cl==Object: return 1
     for base in cl.__bases__:
@@ -224,30 +232,30 @@ uri_type = {"from":1, "to":1}
 uri_list_type = {"parent":1, "children":1}
 def attribute_is_type(name, type):
     """is attribute of certain type somewhere in type hierarchy?"""
-    if type=="uri" and uri_type.has_key(name):
+    if type=="uri" and name in uri_type:
         return 1
-    if type=="uri_list" and uri_list_type.has_key(name):
+    if type=="uri_list" and name in uri_list_type:
         return 1
 
 def is_plain(name, value):
-    if type(value)==InstanceType and \
+    if type(value)==typesx.InstanceType and \
        attribute_is_type(name,"uri"):
         return 0
-    if type(value)==ListType and attribute_is_type(name,"uri_list"):
+    if type(value)==typesx.ListType and attribute_is_type(name,"uri_list"):
         for value2 in value:
-            if type(value2)==InstanceType:
+            if type(value2)==typesx.InstanceType:
                 return 0
     return 1
 
 def convert2plain(name, value):
     """convert all references to parents, etc.. objects to string ids"""
     if not is_plain(name, value):
-        if type(value)==InstanceType:
+        if type(value)==typesx.InstanceType:
             value = value.id
         else:
             value = value[:]
             for i in range(len(value)):
-                if type(value[i])==InstanceType:
+                if type(value[i])==typesx.InstanceType:
                     value[i] = value[i].id
     return value
 
@@ -255,14 +263,14 @@ def convert2plain(name, value):
 def find_ids_in_list(id_list, objects):
     """finds all ids in list from objects dictionary keyed by ids"""
     for i in range(len(id_list)):
-        if type(id_list[i])==StringType:
+        if type(id_list[i])==typesx.StringType:
             id_list[i] = objects[id_list[i]]
             
 
 def find_parents_children_objects(objects):
     """replace parent and children id strings with actual objects"""
-    for obj in objects.values():
-        if hasattr(obj, "parent") and type(obj.parent)==StringType and obj.parent != "":
+    for obj in list(objects.values()):
+        if hasattr(obj, "parent") and type(obj.parent)==typesx.StringType and obj.parent != "":
             obj.parent = objects[obj.parent]
         else:
             obj.parent = None
@@ -275,27 +283,27 @@ def has_parent(obj, parent, objects = {}):
             dictionary where it can be found)
        parent can be either string or object
     """
-    if type(obj)==StringType: obj = objects[obj]
+    if type(obj)==typesx.StringType: obj = objects[obj]
     return obj.has_parent(parent)
 
 
 #create an entity from a dictionary
 def make_object_from_dict(dict):
-	return apply(Object,(),dict)
+	return Object(*(), **dict)
 
 
 def resolve_pointer2(base_dict, id):
-    id_lst = string.split(id, ".")
+    id_lst = typesx.split(id, ".")
     obj = base_dict
     while id_lst:
-        if type(obj)==ListType:
+        if type(obj)==typesx.ListType:
             id = int(id_lst[0])
         else:
             id = id_lst[0]
         del id_lst[0]
         if not id_lst: return obj, id
         obj = obj[id]
-    raise KeyError, "empty id"
+    raise KeyError("empty id")
 
 def resolve_pointer(base_dict, id):
     obj, id = resolve_pointer2(base_dict, id)
@@ -303,19 +311,19 @@ def resolve_pointer(base_dict, id):
 
 
 def get_base_id(id):
-    return string.split(id, ".")[0]
+    return typesx.split(id, ".")[0]
 
 def get_last_part(id):
-    return string.split(id, ".")[-1]
+    return typesx.split(id, ".")[-1]
     
 
 def print_parents(obj):
-    print obj.id,
+    print(obj.id, end=' ')
     o2 = obj
     if hasattr(o2, "parent"):
         o2 = o2.parent
         if hasattr(o2, "id"):
-            print "->", o2.id,
+            print("->", o2.id, end=' ')
         else:
-            print "->", o2,
-    print
+            print("->", o2, end=' ')
+    print()

@@ -1,3 +1,4 @@
+from __future__ import print_function
 #bridge: combine negotiation and codecs
 
 #Copyright 2002 by AIR-IX SUUNNITTELU/Ahiplan Oy
@@ -17,6 +18,8 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from builtins import str
+from builtins import object
 from atlas.transport.negotiation import NegotiationClient
 import atlas
 from atlas.util.debug import debug
@@ -25,7 +28,7 @@ debug_flag = 0
 
 class BridgeException(Exception): pass
 
-class Bridge:
+class Bridge(object):
     """includes negotiation at start and codecs when sending/receiving
        translation from Object to string: return string to be transmitted
           (or at begin negotiation strings)
@@ -59,25 +62,25 @@ class Bridge:
                 self.log = functions.log
 
     #replace these 4 functions with your own
-    def send_string(self, data):
-        """send string using transport specific method: specify your own"""
-        if debug_flag:
-            print "send_string:", data
+    #def send_string(self, data):
+    #    """send string using transport specific method: specify your own"""
+    #    if debug_flag:
+    #        print("send_string:", data)
 
-    def operation_received(self, op):
-        """this is called for eac decoded operation"""
-        if debug_flag:
-            print "operation_received:", op
+    #def operation_received(self, op):
+    #    """this is called for eac decoded operation"""
+    #    if debug_flag:
+    #        print("operation_received:", op)
 
-    def connection_ok(self):
-        """this is called after negotiation is done"""
-        if debug_flag:
-            print "connection_ok"
+    #def connection_ok(self):
+    #    """this is called after negotiation is done"""
+    #    if debug_flag:
+    #        print("connection_ok")
 
-    def log(self, type, data):
-        """various debug things"""
-        s = "\n%s:\n%s" % (type, data)
-        debug(s)
+    #def log(self, type, data):
+    #    """various debug things"""
+    #    s = "\n%s:\n%s" % (type, data)
+    #    debug(s)
 
     #externally usable methods
 
@@ -116,7 +119,7 @@ class Bridge:
         if self.codec:
             res_str = ""
             if self.operations_to_send:
-                msg = apply(atlas.Messages, self.operations_to_send)
+                msg = atlas.Messages(*self.operations_to_send)
                 self.operations_to_send = []
                 res_str = res_str + self.internal_send_string(self.codec.encode(msg))
             if op!=None:

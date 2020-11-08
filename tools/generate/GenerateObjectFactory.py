@@ -7,12 +7,15 @@
 # just used to partition gen_cpp.py into files,
 # not usable without GenerateCC class
 
+from builtins import str
+from builtins import object
 __revision__ = '$Id$'
 
 from common import *
+from atlas import typesx
 
 
-class GenerateObjectFactory:
+class GenerateObjectFactory(object):
     def generate_object_factory(self, objects, max_class_no):
         # print "Output of implementation for:",
         outfile = self.outdir + '/Factories_generated.cpp'
@@ -34,7 +37,7 @@ void Factories::installStandardTypes()
         for (obj, namespace) in objects:
             id = obj.id
             idc = classize(id)
-            idu = string.upper(id)
+            idu = typesx.upper(id)
             self.write("""
     addFactory<%(namespace)s%(idc)sData>("%(id)s", %(namespace)s%(idu)s_NO);
 """ % vars())  # "for xemacs syntax highlighting

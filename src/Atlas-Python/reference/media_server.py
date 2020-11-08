@@ -17,6 +17,7 @@
 #License along with this library; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+from __future__ import print_function
 import sys
 sys.path.append("..")
 from atlas.transport.TCP.server import SocketServer, TcpClient
@@ -34,7 +35,7 @@ class MediaServer(SocketServer):
     def setup(self):
         #self.objects = read_and_analyse("media.bach")
         self.objects = read_and_analyse("simple_core.atlas")
-        print len(self.objects), "objects loaded"
+        print(len(self.objects), "objects loaded")
 
 class MediaClient(TcpClient):
     def get_op(self, op):

@@ -21,4 +21,4 @@ time_on()
 for i in range(maxi):
     x,y,z = npc1.move(i+0.0, i-1.0, i+1.0)
 time_off("NPC movements", maxi)
-print "Resulting position: (%s,%s,%s)" % (x,y,z)
+print ("Resulting position: (%s,%s,%s)" % (x,y,z))

@@ -4,12 +4,13 @@
 # Copyright (C) 2001-2005 Alistair Riddoch
 # Copyright (C) 2011 Erik Ogenvik
 
+from builtins import object
 __revision__ = '$Id$'
 
 from common import *
 
 
-class AttributeInfo:
+class AttributeInfo(object):
     attr_enum = {"_free": 1}
 
     def __init__(self, name, value, type=None):
@@ -31,7 +32,7 @@ class AttributeInfo:
         self.ctype_as_object = self.ctype
 
     def get_num(self):
-        if self.attr_enum.has_key(self.name):
+        if self.name in self.attr_enum:
             return self.attr_enum[self.name]
         num = self.attr_enum['_free']
         self.attr_enum['_free'] = num + 1
@@ -249,7 +250,7 @@ inline %(cpp_param_type2)s %(classname)s::modify%(cname)s()
     def default_map(self, name, obj):
         obj = self.check_obj(name, obj)
         res = "        MapType " + name + ";\n"
-        for (sub_name, sub_value) in obj.value.items():
+        for (sub_name, sub_value) in list(obj.value.items()):
             sub = AttributeInfo(sub_name, sub_value)
             if sub.type == "list":
                 res = res + self.default_list("%s_%s" % (name, sub.name), sub)

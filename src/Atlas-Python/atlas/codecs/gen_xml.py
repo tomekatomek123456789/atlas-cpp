@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 #generate XML from objects
 
 #Copyright 2000 by Aloril
@@ -18,10 +19,14 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from builtins import str
+from builtins import map
+from builtins import object
 import string
 from atlas.typemap import *
 import atlas
-import encoder
+from atlas import typesx
+from . import encoder
 
 class Encoder(encoder.BaseEncoder):
     begin_string = "<atlas>\n"
@@ -45,7 +50,7 @@ def gen_xml(obj, indent=""):
     gen = GenerateXML(indent)
     return gen.encode(obj)
 
-class GenerateXML:
+class GenerateXML(object):
     def __init__(self, base_indent=""):
         self.base_indent = base_indent
     def encode(self, obj):
@@ -58,9 +63,9 @@ class GenerateXML:
     
     def to_string(self, value):
         if type(value)==StringType:
-            value = string.replace(value,"&","&amp;")
-            value = string.replace(value,"<","&lt;")
-            value = string.replace(value,">","&gt;")
+            value = typesx.replace(value,"&","&amp;")
+            value = typesx.replace(value,"<","&lt;")
+            value = typesx.replace(value,">","&gt;")
             return value
         elif type(value)==LongType:
             value = str(value)
@@ -76,7 +81,7 @@ class GenerateXML:
         """this encodes mappings"""
         str_list = []
         add_line = str_list.append
-        for name, value in obj.items():
+        for name, value in list(obj.items()):
             if value is not None:
                 if name == "parent":
                     str_type = "string"
@@ -92,13 +97,13 @@ class GenerateXML:
                         if str_value: add_nl = 1
                     elif str_type=="list":
                         str_value = self.list2xml(value, indent+"\t")
-                        if string.find(str_value, "\t")>=0: add_nl = 1
+                        if typesx.find(str_value, "\t")>=0: add_nl = 1
                     else:
                         #int/float/string
                         str_value = self.to_string(value)
                     if add_nl: str_value = "\n%s\n%s" % (str_value, indent)
                 add_line(self.encode_attribute(indent, name, str_type, str_value))
-        return string.join(str_list, "\n")
+        return typesx.join(str_list, "\n")
 
     def list2xml(self, lst, indent):
         str_list = []
@@ -118,7 +123,7 @@ class GenerateXML:
                 #int/float/string
                 add_item("<%s>%s</%s>" % (str_type, self.to_string(item), str_type))
         if complex_in_list:
-            str_list = map(lambda s,i=indent:i+s, str_list)
-            return string.join(str_list,"\n")
+            str_list = list(map(lambda s,i=indent:i+s, str_list))
+            return typesx.join(str_list,"\n")
         else:
-            return string.join(str_list,"")
+            return typesx.join(str_list,"")

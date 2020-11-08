@@ -1,3 +1,4 @@
+from __future__ import print_function
 #if print line is uncommented, outputs debug info
 
 #Copyright 2001 by Aloril
@@ -20,4 +21,4 @@ debug_flag = 0
 
 def debug(msg):
     if debug_flag:
-        print msg
+        print(msg)

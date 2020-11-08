@@ -6,5 +6,5 @@ def time_on():
 
 def time_off(msg, maxi):
     cpu_time = time() - start_time
-    print "%s: iterations=%s  CPU Time=%s  iter/s=%s" % (
-        msg, maxi, cpu_time, maxi/cpu_time)
+    print ("%s: iterations=%s  CPU Time=%s  iter/s=%s" % (
+        msg, maxi, cpu_time, maxi/cpu_time))

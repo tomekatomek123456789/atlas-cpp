@@ -18,6 +18,7 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from __future__ import print_function
 import sys
 sys.path.append("..")
 import atlas
@@ -31,7 +32,7 @@ from atlas.media.info import MediaInfo
 try:
     from wxPython.wx import *
 except ImportError:
-    print "Need wxPython from wxPython.org"
+    print("Need wxPython from wxPython.org")
     sys.exit(1)
 from wxPython.lib.PyCrust import shell, version
 
@@ -62,9 +63,9 @@ class MapClientApp(BlackboardApp):
         
 def main(argv):
     c = Client("Coders map client", args2address(argv))
-    print "Connecting..."
+    print("Connecting...")
     c.connect_and_negotiate()
-    print "ok"
+    print("ok")
     app = MapClientApp("Coders map client", c)
     c.after_connection_setup()
     app.register_triggers()

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 #experimental XML2 codec
 
 #Copyright 2001 by Aloril
@@ -17,10 +18,12 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from future.utils import raise_
 import string
 from atlas.typemap import *
+from atlas import typesx
 
-import gen_xml, parse_xml
+from . import gen_xml, parse_xml
 
 def gen_xml2(obj):
     gen = GenerateXML2()
@@ -103,14 +106,14 @@ class XML2Parser(parse_xml.AtlasParser):
             method = getattr(self, method_name)
             attributes["name"] = tag
             return method(attributes)
-        raise XmlException, "Unknown tag: "+tag
+        raise_(XmlException, "Unknown tag: "+tag)
 
     def unknown_endtag(self, tag):
         method_name = "end_" + attribute_type_dict.get(tag, "")
         if hasattr(self, method_name):
             method = getattr(self, method_name)
             return method()
-        raise XmlException, "Unknown tag: "+tag
+        raise_(XmlException, "Unknown tag: "+tag)
 
     
 def get_parser():

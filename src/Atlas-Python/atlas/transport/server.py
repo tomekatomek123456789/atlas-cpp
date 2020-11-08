@@ -24,9 +24,10 @@ SocketServer: handle connections and sending/receiving stuff
               use given client class to make client instances
 BaseServer: handle negotiation using above
 """
+from __future__ import absolute_import
 
 import atlas, negotiation
-from connection import args2address
+from .connection import args2address
 from atlas.util.debug import debug
 from atlas.transport.connection import Loop
 

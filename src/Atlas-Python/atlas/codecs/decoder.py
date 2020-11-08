@@ -16,10 +16,11 @@
 #License along with this library; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-
+from xml.etree.ElementTree import XMLParser
+from builtins import object
 import atlas
 
-class BaseDecoder:
+class BaseDecoder(XMLParser):
     def setup(self, stream_flag=None):
         self.data = ""
         self.msgList = []
@@ -35,7 +36,7 @@ class BaseDecoder:
         self.msg=msg
         self.feed(msg) #inherited from XMLParser
         if self.stream_flag:
-            res=apply(atlas.Messages,tuple(self.msgList))
+            res=atlas.Messages(*tuple(self.msgList))
             self.msgList=[]
             return res
         else:

@@ -19,6 +19,8 @@
 
 
 #for arguments, default values, ussage and other info see atlas/transport/TCP/relay_server.py
+from __future__ import print_function
+from builtins import str
 import sys
 sys.path.append("..")
 from atlas.transport.TCP.relay_server import *
@@ -41,9 +43,9 @@ def translate_0_2_to_0_3(op):
 
 class From_0_2_to_0_3(RelayClient):
     def operation_received(self, op):
-        print ("this client: received 0.2.X:", op)
+        print("this client: received 0.2.X:", op)
         translate_0_2_to_0_3(op)
-        print ("translated into 0.3:", op)
+        print("translated into 0.3:", op)
         self.relay_connection.send_operation(op)
 
 
@@ -72,9 +74,9 @@ def translate_0_3_to_0_2(op):
 
 class From_0_3_to_0_2(OtherClient):
     def operation_received(self, op):
-        print "other_client: received 0.3:", op
+        print("other_client: received 0.3:", op)
         translate_0_3_to_0_2(op)
-        print "translated into 0.2.X:", op
+        print("translated into 0.2.X:", op)
         self.relay_connection.send_operation(op)
 
 

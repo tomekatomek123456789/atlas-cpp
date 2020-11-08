@@ -4,9 +4,15 @@
 # Copyright (C) 2000 Stefanus Du Toit and Aloril
 # Copyright (C) 2001-2005 Alistair Riddoch
 
+from __future__ import division
+from __future__ import print_function
+from builtins import map
+from builtins import range
+from past.utils import old_div
 __revision__ = '$Id$'
 
 from common import *
+from atlas import typesx
 from AttributeInfo import *
 from GenerateForward import GenerateForward
 from GenerateObjectFactory import GenerateObjectFactory
@@ -29,7 +35,7 @@ class GenerateCC(GenerateObjectFactory, GenerateForward):
     def __call__(self, obj, class_only_files):
         self.classname = classize(obj.id, data=1)
         self.classname_pointer = classize(obj.id)
-        self.generic_class_name = capitalize_only(string.split(obj.id, "_")[-1])
+        self.generic_class_name = capitalize_only(typesx.split(obj.id, "_")[-1])
         self.interface_file(obj)
         self.implementation_file(obj)
         if class_only_files:
@@ -40,11 +46,11 @@ class GenerateCC(GenerateObjectFactory, GenerateForward):
             # self.decoder()
         else:
             res = [obj]
-        return map(lambda o, n=self.name_space: (o, n), res)
+        return list(map(lambda o, n=self.name_space: (o, n), res))
 
     def find_attr_class(self, obj):
         name = obj.id
-        if attr_name2class.has_key(name):
+        if name in attr_name2class:
             return name, attr_name2class[name]
 
         res = self.find_attr_class(obj.parent)
@@ -53,7 +59,7 @@ class GenerateCC(GenerateObjectFactory, GenerateForward):
     def get_name_value_type(self, obj, first_definition=0,
                             real_attr_only=0, include_desc_attrs=0):
         lst = []
-        for name, value in obj.items():
+        for name, value in list(obj.items()):
             if not include_desc_attrs and name in descr_attrs:
                 continue
             # required that no parent has this attribute?
@@ -64,16 +70,14 @@ class GenerateCC(GenerateObjectFactory, GenerateForward):
             otype, attr_class_lst = self.find_attr_class(self.objects[name])
             # print 'Attr ', attr_class_lst, name, value, otype
             if real_attr_only:
-                lst.append(apply(attr_class_lst[0],
-                                 (name, value, otype)))
+                lst.append(attr_class_lst[0](*(name, value, otype)))
             else:
                 for attr_class in attr_class_lst:
-                    lst.append(apply(attr_class,
-                                     (name, value, otype)))
+                    lst.append(attr_class(*(name, value, otype)))
         return lst
 
     def set_attributes(self, obj, include_desc_attrs, lst, used_attributes):
-        for name, value in obj.items():
+        for name, value in list(obj.items()):
             if not include_desc_attrs and name in descr_attrs:
                 continue
             if name in ['id', 'parent']:
@@ -85,8 +89,7 @@ class GenerateCC(GenerateObjectFactory, GenerateForward):
                     value = 'obj'
             otype, attr_class_lst = self.find_attr_class(self.objects[name])
             if name not in used_attributes:
-                lst.append(apply(attr_class_lst[0],
-                                 (name, value, otype)))
+                lst.append(attr_class_lst[0](*(name, value, otype)))
                 used_attributes.append(name)
 
         if hasattr(obj, "parent") and obj.parent is not None:
@@ -96,10 +99,10 @@ class GenerateCC(GenerateObjectFactory, GenerateForward):
         lst = []
         used_attributes = []
         self.set_attributes(obj, include_desc_attrs, lst, used_attributes)
-        if obj.has_key('id'):
+        if 'id' in obj:
             parent = obj['id']
             otype, attr_class_lst = self.find_attr_class(self.objects['parent'])
-            lst.append(apply(attr_class_lst[0], ('parent', parent, 'string')))
+            lst.append(attr_class_lst[0](*('parent', parent, 'string')))
         return lst
 
     def get_cpp_parent(self, obj):
@@ -115,12 +118,12 @@ class GenerateCC(GenerateObjectFactory, GenerateForward):
     def header(self, list, copyright=copyright):
         self.write(copyright)
         self.write("\n")
-        guard = string.join(map(string.upper, list), "_")
+        guard = typesx.join(list(map(typesx.upper, list)), "_")
         self.write("#ifndef " + guard + "\n")
         self.write("#define " + guard + "\n\n")
 
     def footer(self, list):
-        guard = string.join(map(string.upper, list), "_")
+        guard = typesx.join(list(map(typesx.upper, list)), "_")
         self.write("\n#endif // " + guard + "\n")
 
     # namespace
@@ -132,7 +135,7 @@ class GenerateCC(GenerateObjectFactory, GenerateForward):
     def ns_close(self, ns_list):
         for i in range(0, len(ns_list)):
             self.write("} ")
-        self.write("// namespace " + string.join(ns_list, "::"))
+        self.write("// namespace " + typesx.join(ns_list, "::"))
         self.write("\n")
 
     def doc(self, indent, text):
@@ -143,19 +146,19 @@ class GenerateCC(GenerateObjectFactory, GenerateForward):
             if filecmp(outfile + ".tmp", outfile) == 0:
                 os.remove(outfile)
                 os.rename(outfile + ".tmp", outfile)
-                print "Generated:", outfile
+                print("Generated:", outfile)
             else:
                 # print "Output file same as existing one, not updating"
                 os.remove(outfile + ".tmp")
         else:
             os.rename(outfile + ".tmp", outfile)
-            print "Generated:", outfile
+            print("Generated:", outfile)
 
     def constructors_if(self, obj, static_attrs):
         self.doc(4, "Construct a " + self.classname + " class definition.")
         classname_base = self.get_cpp_parent(obj)
         classname = self.classname
-        serialno_name = string.upper(obj.id) + "_NO"
+        serialno_name = typesx.upper(obj.id) + "_NO"
         self.write("""    explicit %(classname)s(%(classname)s *defaults = nullptr) : 
         %(classname_base)s((%(classname_base)s*)defaults)
     {
@@ -209,7 +212,7 @@ class GenerateCC(GenerateObjectFactory, GenerateForward):
 
     def getattrclass_im(self, obj, statics):
         classname = classize(obj.id, data=1)
-        serialno_name = string.upper(obj.id) + "_NO"
+        serialno_name = typesx.upper(obj.id) + "_NO"
         self.write("int %s::getAttrClass(const std::string& name) const\n"
                    % classname)
         self.write("{\n")
@@ -425,7 +428,7 @@ void %(classname)s::fillDefaultObjectInstance(%(classname)s& data, std::map<std:
     def instanceof_im(self, obj):
         classname_base = self.get_cpp_parent(obj)
         classname = self.classname
-        serialno_name = string.upper(obj.id) + "_NO"
+        serialno_name = typesx.upper(obj.id) + "_NO"
         self.write("""bool %(classname)s::instanceOf(int classNo) const
 {
     if(%(serialno_name)s == classNo) return true;
@@ -471,7 +474,7 @@ void %(classname)s::fillDefaultObjectInstance(%(classname)s& data, std::map<std:
         self.smart_ptr_if()
         global class_serial_no
         self.write("static const int %s_NO = %i;\n\n" % (
-            string.upper(obj.id), class_serial_no))
+            typesx.upper(obj.id), class_serial_no))
         class_serial_no = class_serial_no + 1
         self.write("/// \\brief " + obj.description + ".\n")
         if hasattr(obj, 'long_description'):
@@ -566,7 +569,7 @@ void %(classname)s::fillDefaultObjectInstance(%(classname)s& data, std::map<std:
                        + "const override;\n")
 
             for attr in static_attrs:
-                if self.objects.has_key(attr.name):
+                if attr.name in self.objects:
                     attr_object = self.objects[attr.name]
                     if hasattr(attr_object, 'description'):
                         self.doc(4, attr_object.description)
@@ -646,7 +649,7 @@ void %(classname)s::fillDefaultObjectInstance(%(classname)s& data, std::map<std:
         self.smart_ptr_if("Instance")
         classname_base = self.classname
         classname = classname_base + "Instance"
-        serialno_name = string.upper(obj.id) + "_INSTANCE_NO"
+        serialno_name = typesx.upper(obj.id) + "_INSTANCE_NO"
         global class_serial_no
         cs_no = class_serial_no
         self.write("""
@@ -720,7 +723,7 @@ public:
         else:
             for i in range(0, len(self.progeny), size_limit):
                 self.children_implementation_one_file(
-                    obj, i / size_limit + 1, self.progeny[i:i + size_limit])
+                    obj, old_div(i, size_limit) + 1, self.progeny[i:i + size_limit])
 
     def children_implementation_one_file(self, obj, serial, progeny):
         # print "Output of implementation for:",
@@ -761,7 +764,7 @@ if __name__ == "__main__":
     objects["anonymous"] = Object(id="anonymous", parent=objects["root_entity"])
     objects["generic"] = Object(id="generic", parent=objects["root_operation"])
 
-    print "Loaded %s" % atlas_file
+    print("Loaded %s" % atlas_file)
 
     ##     if len(sys.argv) >= 3:
     ##         outdir = sys.argv[2]

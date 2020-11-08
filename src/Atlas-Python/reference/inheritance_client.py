@@ -17,6 +17,7 @@
 #License along with this library; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+from __future__ import print_function
 import sys, time
 sys.path.append("..")
 from atlas.transport.TCP.client import TcpClient
@@ -34,7 +35,7 @@ class Client(TcpClient):
         
     def info_op(self, op):
         ent = op.arg
-        print ent
+        print(ent)
         del self.waiting[ent.id]
         for id in ent.children:
             self.ask(id)

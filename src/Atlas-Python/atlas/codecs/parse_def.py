@@ -1,3 +1,4 @@
+from __future__ import print_function
 #parse def format
 
 #Copyright 2000 by Aloril
@@ -15,13 +16,16 @@
 #You should have received a copy of the GNU Lesser General Public
 #License along with this library; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+from future.utils import raise_
+from builtins import object
 import os
 import string, re
 
 from atlas import *
 from atlas.typemap import get_atlas_type
+from atlas import typesx
 
-class DefParser:
+class DefParser(object):
     """reads 'atlas def' files into atlas Objects"""
     def __init__(self):
         self.id_dict = {}
@@ -39,7 +43,7 @@ class DefParser:
                 continue
             if space_count>depth: #sub object
                 if last_obj==None:
-                    raise SyntaxError, ("Unexpected indentation",
+                    raise SyntaxError("Unexpected indentation",
                                         (self.filename, self.lineno, space_count, line))
                 self.parse_lines(lines, space_count, last_obj)
                 last_obj = None
@@ -66,14 +70,14 @@ class DefParser:
                 else:
                     type=""
             else:
-                raise SyntaxError, ("Unexpected element numbers (things delimited with ':')",
+                raise SyntaxError("Unexpected element numbers (things delimited with ':')",
                                     (self.filename, self.lineno, space_count, line))
             if type=="list": #new list subobject
                 if len(value):
                     try:
                         value=eval(value)
                     except:
-                        print "Error at:",(self.filename, self.lineno, line)
+                        print("Error at:",(self.filename, self.lineno, line))
                         raise
                 else:
                     value = []
@@ -91,12 +95,12 @@ class DefParser:
                         self.lineno=self.lineno+1
                         line = lines[self.lineno]
                         value = value + line
-                        if not line or string.find(line,'"""')>=0:
+                        if not line or typesx.find(line,'"""')>=0:
                             break
                 try:
                     value=eval(value)
                 except:
-                    print "Error at:",(self.filename, self.lineno, line)
+                    print("Error at:",(self.filename, self.lineno, line))
                     raise
                 last_obj=None
             if name:
@@ -118,7 +122,7 @@ class DefParser:
 
     def syntax_error(self, msg, obj):
         info = obj.specification_file
-        raise SyntaxError, "%s at %s:%s" % (msg, info.filename, info.lineno)
+        raise_(SyntaxError, "%s at %s:%s" % (msg, info.filename, info.lineno))
 
     def check_fill(self):
         """fill missing attributes and check for attribute definitions"""
@@ -135,7 +139,7 @@ class DefParser:
             except AttributeError:
                 self.syntax_error(
                     "Id attribute is not specified for object", obj)
-            if self.id_dict.has_key(id):
+            if id in self.id_dict:
                 self.syntax_error(
                     'Object with "'+id+'"-id already exists', obj)
             self.id_dict[id]=obj
@@ -160,11 +164,11 @@ class DefParser:
 
     def check_type_object(self, obj):
         """recursively check types for all objects"""
-        if type(obj)==ListType:
+        if type(obj)==typesx.ListType:
             for sub_obj in obj:
                 self.check_type_object(sub_obj)
-        elif type(obj)==InstanceType:
-            for name, value in obj.items():
+        elif type(obj)==typesx.InstanceType:
+            for name, value in list(obj.items()):
                 if name != "parent":
                     if value:
                         try:
@@ -195,4 +199,4 @@ def read_all_defs(filelist):
 
 if __name__=="__main__":
     filelist=["root","entity","operation","type"]
-    defs=read_all_defs(map(lambda file:file+".def", filelist))
+    defs=read_all_defs([file+".def" for file in filelist])

@@ -17,6 +17,8 @@
 #License along with this library; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+from __future__ import print_function
+from builtins import input
 import sys, time
 sys.path.append("..")
 from atlas.transport.TCP.client import TcpClient
@@ -26,10 +28,10 @@ import atlas
 class HelloWorldClient(TcpClient):
     def sound_op(self, op):
         talk_op = op.arg
-        print "%s said %s" % (op.from_, talk_op.arg.say)
+        print("%s said %s" % (op.from_, talk_op.arg.say))
 
 if __name__=="__main__":
     s = HelloWorldClient("Hello World client", args2address(sys.argv))
-    name = raw_input("Nick/Name to use: ")
+    name = input("Nick/Name to use: ")
     s.send_operation(atlas.Operation("talk", atlas.Object(say="Hello World!"), from_ = name))
     s.loop()

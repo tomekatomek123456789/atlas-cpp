@@ -18,8 +18,12 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from builtins import str
+from builtins import map
 import string
 from atlas.typemap import *
+
+from . import  typesx
 
 #see bach.py for encoder
 
@@ -31,12 +35,12 @@ def encode(value, indent=""):
 
 int_characters = "+-" + string.digits
 float_characters = ".eE" + int_characters
-plain_name_characters = string.digits + string.uppercase + string.lowercase + "_"
+plain_name_characters = string.digits + typesx.uppercase + typesx.lowercase + "_"
 string_quoted = '"\\'
 def encode_name(value):
     res = []
     plain_flag = 1
-    if type(value)!=StringType:
+    if type(value)!=typesx.StringType:
         value = str(value)
     for ch in value:
         if ch in string_quoted:
@@ -46,9 +50,9 @@ def encode_name(value):
         if not ch in plain_name_characters:
             plain_flag = 0
     if plain_flag:
-        return string.join(res, "")
+        return str.join("", res)
     else:
-        return '"%s"' % string.join(res, "")
+        return '"%s"' % str.join("", res)
 
 def encode_string(value, indent):
     res = []
@@ -57,7 +61,7 @@ def encode_string(value, indent):
             res.append("\\" + ch)
         else:
             res.append(ch)
-    return '"%s"' % string.join(res, "")
+    return '"%s"' % typesx.join(res, "")
 
 ##def encode_map(obj, indent=""):
 ##    str_list = []
@@ -72,7 +76,7 @@ def encode_map(obj, indent=""):
     if not obj: return "{}"
     str_list = []
     indent = indent + "\t"
-    for name, value in obj.items():
+    for name, value in list(obj.items()):
         if value is not None:
             str_type = get_atlas_type(value)
             add_nl = 0
@@ -81,10 +85,10 @@ def encode_map(obj, indent=""):
             if str_type=="map":
                 if value: add_nl = 1
             elif str_type=="list":
-                if string.find(str_value, "\t")>=0: add_nl = 1
+                if typesx.find(str_value, "\t")>=0: add_nl = 1
             #if add_nl: str_value = "\n<a>%s<b>\n<c>%s<d>" % (str_value, indent)
             str_list.append("%s%s: %s" % (indent, str_name, str_value))
-    return "{\n%s\n%s}" % (string.join(str_list, ",\n"), indent[:-1])
+    return "{\n%s\n%s}" % (typesx.join(str_list, ",\n"), indent[:-1])
 
 def encode_list(lst, indent=""):
     str_list = []
@@ -97,10 +101,10 @@ def encode_list(lst, indent=""):
         if str_type in ["map", "list"]:
             complex_in_list = 1
     if complex_in_list:
-        str_list = map(lambda s,i=indent:"\n"+i+s, str_list)
-        res =  string.join(str_list,",") + "\n" + indent[:-1]
+        str_list = list(map(lambda s,i=indent:"\n"+i+s, str_list))
+        res =  typesx.join(str_list,",") + "\n" + indent[:-1]
     else:
-        res =  string.join(str_list,", ")
+        res =  typesx.join(str_list,", ")
     return "[%s]" % res
 
 def encode_int(value, indent=""):

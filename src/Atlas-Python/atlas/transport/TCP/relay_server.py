@@ -31,6 +31,7 @@
 #--output: where to make output (default stdout)
 
 #defaults
+from __future__ import print_function
 default_this_host = ''
 default_this_port = 6768
 default_other_host = ''
@@ -71,13 +72,13 @@ class RelayClient(atlas.transport.TCP.server.TcpClient):
         self.relay_connection.relay_connection = self
 
     def operation_received(self, op):
-        print "this client: received:", op
+        print("this client: received:", op)
         self.relay_connection.send_operation(op)
 
 
 class OtherClient(atlas.transport.TCP.client.TcpClient):
     def operation_received(self, op):
-        print "other_client: received:", op
+        print("other_client: received:", op)
         self.relay_connection.send_operation(op)
 
 def args2relay_address(args):

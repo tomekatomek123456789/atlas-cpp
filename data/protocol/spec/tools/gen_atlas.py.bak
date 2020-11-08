@@ -1,6 +1,7 @@
-#map type into atlas type string
+#generate atlas.al from source files
 
-#Copyright 2000, 2001 by Aloril
+#Copyright (C) 2000 Aloril
+#Copyright (C) 2002 by AIR-IX SUUNNITTELU/Ahiplan Oy
 
 #This library is free software; you can redistribute it and/or
 #modify it under the terms of the GNU Lesser General Public
@@ -17,21 +18,14 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
-from types import *
-from .typesx import *
+import init
+import operator
+from atlas.analyse import fill_attributes
+from atlas.transport.file import read_file, write_file
 
-_type2str = {IntType: "int",
-             LongType: "int",
-             FloatType: "float",
-             StringType: "string",
-             ListType: "list",
-             TupleType: "list",
-             DictType: "map",
-             InstanceType: "?"}
-
-def get_atlas_type(value):
-    type_str = _type2str[type(value)]
-    if type_str=="?":
-        if hasattr(value, "items"): return "map"
-        return "list"
-    return type_str
+if __name__=="__main__":
+    filelist = ["root", "entity", "operation", "type"]
+    filelist = map(lambda file:file+".atlas", filelist)
+    objects = reduce(operator.add, map(read_file, filelist))
+    fill_attributes(objects)
+    write_file(objects, "atlas.atlas")

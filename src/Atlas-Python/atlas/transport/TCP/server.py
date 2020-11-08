@@ -1,3 +1,4 @@
+from __future__ import print_function
 #TCP/IP server library code
 
 #Copyright 2001 by Aloril, Anders Petersson
@@ -19,16 +20,22 @@
 
 #code stealed from old libAtlasPy and from silence-py/net_atlas.py
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 import socket, select, string, traceback
 from atlas.transport.server import BaseServer
 from atlas.transport.TCP.connection import TcpConnection
 from atlas.transport.negotiation import NegotiationServer
 from atlas.transport.bridge import Bridge
 from atlas.util.debug import debug
-from StringIO import StringIO
+from io import StringIO
 
 class SocketServer(BaseServer):
-    def __init__(self, name, (host, port), client_factory):
+
+    client = None
+    def __init__(self, name, host, port, client_factory):
+        #(host, port) = xxx_todo_changeme
         self.clients2send = []
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #self.socket.setblocking(0)
@@ -46,8 +53,8 @@ class SocketServer(BaseServer):
         #debug("Selecting: " + str(map(lambda s: s.fileno(), fd_in)))
         fd_out = self.clients2send
 
-	fd_err = fd_in + fd_out
-	
+        fd_err = fd_in + fd_out
+    
         try:
             ready_in, ready_out, ready_err = select.select(fd_in, fd_out, fd_err, 0.0)
         except:
@@ -57,26 +64,27 @@ class SocketServer(BaseServer):
             except:
                 import pdb; pdb.set_trace()
 
-	if len(ready_err) > 0:
-	    debug("Clients are borken, " + str(ready_err))
-	for problem in ready_err:
-	    debug("Client[" + str(problem.fileno()) + "] borken, removing...")
-	    if problem in fd_in:
-	    	self.remove_client(problem)
-	    if problem in fd_out:
-		self.clients2send.remove(problem)
-		self.remove_client(client)
-		
+        if len(ready_err) > 0:
+            debug("Clients are borken, " + str(ready_err))
+        for problem in ready_err:
+            debug("Client[" + str(problem.fileno()) + "] borken, removing...")
+            if problem in fd_in:
+                self.remove_client(problem)
+            if problem in fd_out:
+                self.clients2send.remove(problem)
+                self.remove_client(self.client)
+        
         #debug("Ready: " + string.replace(str(map(lambda s: s.fileno(), ready_in+ready_out+ready_err)),"\n", "\\n"))
         if ready_in and ready_in[0]==self.socket:
             ready_in = ready_in[1:]
             new_client = self.client_factory(self, self.socket.accept())
-            print "Connected:", new_client.id
+            print("Connected:", new_client.id)
             self.clients.append(new_client)
             debug("New connection: fileno(): %s, addr: %s" % (new_client.fileno(), new_client.addr))
             #print "getpeername():", new_client.fd.getpeername()
             #print "getsockname():", new_client.fd.getsockname()
         for client in ready_in:
+            self.client = client
             try:
                 res = client.recv()
             except:
@@ -89,6 +97,7 @@ class SocketServer(BaseServer):
                 continue
             #CHEAT!: res is list of messages, in case we want to use it here also...
         for client in ready_out:
+            self.client = client
             try:
                 client.fd.send(client.send_buffer.pop(0))
             except socket.error:
@@ -104,7 +113,8 @@ class SocketServer(BaseServer):
 class TcpClient(TcpConnection):
     """don't use this class directly: derive from it and
        implemnt all needed foo_op -methods"""
-    def __init__(self, server, (fd, (host, addr))):
+    def __init__(self, server, fd, host, addr):
+        #(fd, (host, addr)) = xxx_todo_changeme1
         self.id = "%s:%s" % fd.getpeername()
         self.send_buffer = []
         self.server = server

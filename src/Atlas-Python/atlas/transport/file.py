@@ -18,6 +18,8 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from future.utils import raise_
+from builtins import object
 import atlas
 from atlas import codecs
 from atlas.transport.negotiation import NegotiationServer, NegotiationClient
@@ -25,7 +27,7 @@ from atlas.transport.bridge import Bridge
 
 buf_size = 16384
 
-class File:
+class File(object):
     """client for reading/writing files: currently only read support"""
     def __init__(self, name, mode="r", codec_id=None):
         self.name = name
@@ -66,7 +68,7 @@ class File:
 
     def check_negotiation_ok(self):
         if not self.bridge.codec:
-            raise IOError, "no codec negotiated in file %s" % self.name
+            raise_(IOError, "no codec negotiated in file %s" % self.name)
 
     def read_all_as_list(self):
         objects = atlas.Messages()

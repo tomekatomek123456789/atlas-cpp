@@ -18,15 +18,12 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
-from builtins import str
-from future.utils import raise_
 import init
 
 from atlas import *
 from atlas.typemap import *
 from htmlPARSER.parserlib import baseParser
 from atlas.transport.file import read_file_as_dict
-from atlas import typesx
 
 
 class atlas_spec_parser(baseParser):
@@ -37,10 +34,10 @@ class atlas_spec_parser(baseParser):
     def text2html(self, text):
         sl=[]
         sl.append("    <PRE>")
-        text=typesx.replace(text,"&","&amp;")
-        sl.append(typesx.replace(text,"<","&lt;"))
+        text=string.replace(text,"&","&amp;")
+        sl.append(string.replace(text,"<","&lt;"))
         sl.append("    </PRE>")
-        return typesx.join(sl,"\n")
+        return string.join(sl,"\n")
 
     def parse(self, input, output):
         self.output=open(output,"w")
@@ -53,7 +50,7 @@ class atlas_spec_parser(baseParser):
             output is only done when "no" is inside
             self.outAllowed.
         """
-        if not "no" in list(self.outAllowed.values()):
+        if not "no" in self.outAllowed.values():
             self.output.write(s)
 
     def do_obj(self,attrs):
@@ -61,7 +58,7 @@ class atlas_spec_parser(baseParser):
             if name=="id":
                 obj=self.objects.get(value)
                 if not obj:
-                    raise_(SyntaxError,"id "+value+" not defined!")
+                    raise SyntaxError,"id "+value+" not defined!"
                 self.output_obj(obj)
 
     def do_objindex(self, attrs):
@@ -98,16 +95,16 @@ class atlas_spec_parser(baseParser):
                         value_list.append(self.text2html(bach))
                         value_list.append("</pre>")
                 value_list.append("<br>")
-                value=typesx.join(value_list,"\n")
+                value=string.join(value_list,"\n")
             elif get_atlas_type(value)=="map":
-                value = repr(value)
+                value = `value`
             s=s+'(encoding:<a href="type.html#%s">%s</a>):</b> Value: <font color="green">%s</font> ' % \
                (get_atlas_type(value), get_atlas_type(value), value)
             s = s + self.objects[name].description
             add_line(s)
         add_line('    </ul>')
         add_line('')
-        self.out(typesx.join(lines,"\n"))
+        self.out(string.join(lines,"\n"))
         self.out("    Bach version:<br>\n")
         bach=str(obj)
         self.out(self.text2html(bach))
@@ -117,10 +114,10 @@ class atlas_spec_parser(baseParser):
         for id in id_list:
             obj=self.objects.get(id)
             if not obj:
-                raise_(SyntaxError,'id "'+id+'" not defined!')
+                raise SyntaxError,'id "'+id+'" not defined!'
             desc = obj.description
             if desc: 
-                if 'description' not in obj:
+                if not obj.has_key('description'):
                     desc='-"-'
             spec=obj.specification
             if spec=="example":
@@ -134,7 +131,7 @@ class atlas_spec_parser(baseParser):
         for id in id_list:
             obj=self.objects.get(id)
             if not obj:
-                raise_(SyntaxError,"id "+id+" not defined!")
+                raise SyntaxError,"id "+id+" not defined!"
             self.output_obj(obj)
             children = obj.get_plain_attribute("children")
             if children:

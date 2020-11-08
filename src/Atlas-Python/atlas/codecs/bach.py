@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 #Bach parser and generator
 
 #Copyright 2001 by Aloril
@@ -18,12 +19,15 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from builtins import str
+from future.utils import raise_
+from builtins import object
 import string
 import atlas
 from atlas.typemap import *
 
 from atlas.gen_bach import *
-import encoder, decoder
+from . import encoder, decoder
 
 class BachException(Exception): pass
 
@@ -47,7 +51,7 @@ def get_encoder(stream_flag=None):
 
 #################decoding
 
-class Context:
+class Context(object):
     def __init__(self, value, excepted_value=""):
         self.value = value
         self.excepted_value = excepted_value # "map_name", "map_value", "list_value"
@@ -88,24 +92,24 @@ class BachParser(decoder.BaseDecoder):
         obj = c.value
         if c.excepted_value == "map_name":
             if not isinstance(obj, atlas.Object):
-                raise BachException, "attribute name outside mapping (%s)!" % \
-                      (value)
+                raise_(BachException, "attribute name outside mapping (%s)!" % \
+                      (value))
             c.name = value
             c.excepted_value = "map_value"
         elif c.excepted_value == "map_value":
             if not isinstance(obj, atlas.Object):
-                raise BachException, "attribute value outside mapping (%s:%s)!" % \
-                      (c.name, value)
+                raise_(BachException, "attribute value outside mapping (%s:%s)!" % \
+                      (c.name, value))
             if type(c.name)!=StringType:
                 c.name = str(c.name)
             setattr(obj, c.name, value)
             c.excepted_value = "map_name"
         elif c.excepted_value == "list_value":
             if type(obj)!=ListType:
-                raise BachException, "object not inside list (%s)!" % value
+                raise_(BachException, "object not inside list (%s)!" % value)
             obj.append(value)
         else:
-            raise BachException, "unknown container (%s)!" % value
+            raise_(BachException, "unknown container (%s)!" % value)
         self.mode = self.skip_white_space
 
     def push(self, value, mode = None, ch=None, excepted_value=""):
@@ -148,7 +152,7 @@ class BachParser(decoder.BaseDecoder):
         elif ch=="#":
             self.mode = self.add_comment
         else:
-            raise BachException, "illegal character (%s (%s) at line %i)!" % (ch, ord(ch), self.lineno)
+            raise_(BachException, "illegal character (%s (%s) at line %i)!" % (ch, ord(ch), self.lineno))
 
     def add_comment(self, ch):
         #CHEAT: should add comment field
@@ -172,7 +176,7 @@ class BachParser(decoder.BaseDecoder):
             try:
                 c.value = int(c.value)
             except ValueError:
-                c.value = long(c.value)
+                c.value = int(c.value)
             self.add_value()
             self.get_next_mode(ch)
 
@@ -206,7 +210,7 @@ class BachParser(decoder.BaseDecoder):
         elif ch in ":" + string.whitespace:
             self.add_value()
         else:
-            raise BachException, "illegal character (%s)!" % ch
+            raise_(BachException, "illegal character (%s)!" % ch)
 
 def get_decoder(stream_flag=None):
     bach_msg_parser=BachParser(stream_flag)

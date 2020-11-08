@@ -19,10 +19,14 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from builtins import chr
+from future.utils import raise_
+from builtins import object
 import string
 from math import frexp, ldexp
 from atlas import Object, Messages
 from atlas.typemap import *
+import typesx
 
 user_type = 0
 int_pos_type = 1
@@ -54,7 +58,7 @@ def encode_pos_int(value):
         if not value: return res
 
 
-class GenerateBinary1:
+class GenerateBinary1(object):
     def __init__(self):
         self.type_name2binary1_code = {"map": self.encode_map,
                                        "list": self.encode_list,
@@ -67,7 +71,7 @@ class GenerateBinary1:
 
     def decode_pos_int(self, input):
         value = 0
-        multiplier = 1L
+        multiplier = 1
         for ch in input:
             value = value + (ord(ch) & ~0x80) * multiplier
             multiplier = multiplier * 128
@@ -91,7 +95,7 @@ class GenerateBinary1:
 
     def encode_float(self, value):
         mant, exp = frexp(value)
-        mant = long(mant *2L**53)
+        mant = int(mant *2**53)
         exp = exp - 53
         if mant>=0:
             if exp>=0:
@@ -118,21 +122,21 @@ class GenerateBinary1:
 
     def encode_map(self, obj):
         str_list = [encode_pos_int(map_type) + encode_pos_int(len(obj))]
-        for name, value in obj.items():
+        for name, value in list(obj.items()):
             str_list.append(self.encode_attribute(name, value))
-        return string.join(str_list, "")
+        return typesx.join(str_list, "")
 
     def encode_list(self, lst):
         str_list = [encode_pos_int(list_type) + encode_pos_int(len(lst))]
         for item in lst:
             str_list.append(self.encode(item))
-        return string.join(str_list,"")
+        return typesx.join(str_list,"")
 
 
 
 class BinaryException(Exception): pass
 
-class Context:
+class Context(object):
     def __init__(self, data_flag, value, decoder=None):
         self.data_flag = data_flag
         self.value = value
@@ -142,7 +146,7 @@ class Context:
         self.is_mapping = 0
         self.is_name = 0
 
-class Binary1Parser:
+class Binary1Parser(object):
     def __init__(self):
         """uses tree that start from root_obj, current route to leave
            is kept in obj_stack"""
@@ -154,7 +158,7 @@ class Binary1Parser:
         
     def parse_stream(self, msg):
         self.feed(msg)
-        res=apply(Messages,tuple(self.msgList))
+        res=Messages(*tuple(self.msgList))
         self.msgList=[]
         return res
     __call__=parse_stream #this makes possible to call instance like
@@ -189,12 +193,12 @@ class Binary1Parser:
             obj = self.stack[-1].value
             if c.name!=None:
                 if not isinstance(obj, Object):
-                    raise BinaryException, "attribute outside mapping (%s:%s)!" % \
-                          (c.name, c.value)
+                    raise_(BinaryException, "attribute outside mapping (%s:%s)!" % \
+                          (c.name, c.value))
                 setattr(obj, c.name, c.value)
             else:
                 if type(obj)!=ListType:
-                    raise BinaryException, "object not inside list (%s)!" % c.value
+                    raise_(BinaryException, "object not inside list (%s)!" % c.value)
                 obj.append(c.value)
             self.stack[-1].decoder()
 
@@ -212,31 +216,31 @@ class Binary1Parser:
         return 0
 
     def init_int_pos(self):
-        self.start_value(0L)
-        self.stack[-1].multiplier = 1L
+        self.start_value(0)
+        self.stack[-1].multiplier = 1
     def init_int_neg(self):
-        self.start_value(0L)
-        self.stack[-1].multiplier = -1L
+        self.start_value(0)
+        self.stack[-1].multiplier = -1
     def decode_int(self, ch):
         if self.decode_int_value(ch):
             self.value_done()
 
     def init_float(self, multiplier1, multiplier2):
-        self.start_value(0L)
+        self.start_value(0)
         self.stack[-1].multiplier = multiplier1
         self.stack[-1].multiplier2 = multiplier2
     def init_float_pos_pos(self):
-        self.init_float(1L, 1L)
+        self.init_float(1, 1)
     def init_float_pos_neg(self):
-        self.init_float(1L, -1L)
+        self.init_float(1, -1)
     def init_float_neg_pos(self):
-        self.init_float(-1L, 1L)
+        self.init_float(-1, 1)
     def init_float_neg_neg(self):
-        self.init_float(-1L, -1L)
+        self.init_float(-1, -1)
     def decode_float_mantissa(self, ch):
         if self.decode_int_value(ch):
             self.mantissa = self.stack[-1].value
-            self.stack[-1].value = 0L
+            self.stack[-1].value = 0
             self.stack[-1].multiplier = self.stack[-1].multiplier2
             self.stack[-1].decoder = self.decode_float_exponent
     def decode_float_exponent(self, ch):

@@ -4,6 +4,7 @@
 # Copyright (C) 2001-2004 Alistair Riddoch
 # Copyright (C) 2011 Erik Ogenvik
 
+from builtins import map
 __revision__ = '$Id$'
 
 import sys, os
@@ -19,6 +20,7 @@ except ImportError:
 sys.path.append("../../Atlas-Python")
 from atlas import *
 from atlas.codecs import *
+from atlas import typesx
 
 
 def deb(): import pdb; pdb.pm()
@@ -113,15 +115,15 @@ cpp_param_type2 = {'map': cpp_type['map'] + '&',
 
 
 def capitalize_only(str):
-    return string.upper(str[:1]) + str[1:]
+    return typesx.upper(str[:1]) + str[1:]
 
 
 # Turns some_thing into SomeThing
 def classize(id, data=0):
     if id is None:
         return "BaseObject"
-    if type(id) != StringType: id = id.id
-    cid = string.join(map(capitalize_only, string.split(id, '_')), "")
+    if type(id) != typesx.StringType: id = id.id
+    cid = typesx.join(list(map(capitalize_only, typesx.split(id, '_'))), "")
     if data: return cid + "Data"
     return cid
 

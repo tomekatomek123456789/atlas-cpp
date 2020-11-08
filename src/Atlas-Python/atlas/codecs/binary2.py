@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 #binary2 codec: nothing really here yet
 
 #Copyright 2001 by Aloril
@@ -16,14 +17,14 @@
 #License along with this library; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+from .. import typesx
+from .binary1 import *
 
-from binary1 import *
-
-import xml2
+from . import xml2
 #attribute_type_dict = {"id": user_type}
 attribute_type_dict = {}
 next_type = user_type
-for name in xml2.attribute_type_dict.keys():
+for name in list(xml2.attribute_type_dict.keys()):
     attribute_type_dict[name] = next_type
     next_type = next_type + 1
 
@@ -43,10 +44,10 @@ class GenerateBinary2(GenerateBinary1):
 
     def encode_map(self, obj):
         str_list = [encode_pos_int(map_type) + encode_pos_int(len(obj))]
-        for name, value in obj.items():
+        for name, value in list(obj.items()):
             if name!=discard_name:
                 str_list.append(self.encode_attribute(name, value))
-        return string.join(str_list, "")
+        return typesx.join(str_list, "")
 
 ##    def encode_float(self, value):
 ##        mant, exp = frexp(value)

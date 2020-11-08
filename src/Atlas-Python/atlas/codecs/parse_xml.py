@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 #parse XML into objects
 
 #Copyright 2000, 2001 by Aloril
@@ -18,11 +19,14 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from future.utils import raise_
 from types import *
-from xmllib import XMLParser
+from xml.etree.ElementTree import XMLParser
+from atlas import typesx
 import atlas
 import string
-import decoder
+from . import decoder
+from . import xml2
 
 """
 usage:
@@ -38,7 +42,7 @@ when several clients connect)
 
 class XmlException(Exception): pass
 
-class AtlasParser(XMLParser,decoder.BaseDecoder):
+class AtlasParser(decoder.BaseDecoder):
     def setup(self, stream_flag=None):
         """uses tree that start from root_obj, current route to leave
            is kept in obj_stack"""
@@ -78,11 +82,11 @@ class AtlasParser(XMLParser,decoder.BaseDecoder):
         
     def eos(self):
         """end of stream"""
-        return not filter(None, map(lambda ch:ch not in string.whitespace, self.data)) and \
+        return not [_f for _f in [ch not in string.whitespace for ch in self.data] if _f] and \
                self.obj_stack == [[]]
 
     def unknown_starttag(self, tag, attributes):
-        raise XmlException, "Unknown tag: "+tag
+        raise_(XmlException, "Unknown tag: "+tag)
 
     def handle_data(self, data):
         """#PCDATA (actual string,int,float,uri content)"""
@@ -106,12 +110,12 @@ class AtlasParser(XMLParser,decoder.BaseDecoder):
         del self.name_stack[-1]
         if name:
             if not isinstance(obj,atlas.Object):
-                raise XmlException, "attribute outside mapping (%s:%s)!" % \
-                      (name, value)
+                raise_(XmlException, "attribute outside mapping (%s:%s)!" % \
+                      (name, value))
             setattr(obj, name, value)
         else:
-            if type(obj)!=ListType:
-                raise XmlException, "value mapping list (%s)!" % value
+            if type(obj)!=typesx.ListType:
+                raise_(XmlException, "value mapping list (%s)!" % value)
             obj.append(value)
 
     def push_value(self, attributes, initial_value):
@@ -137,7 +141,7 @@ class AtlasParser(XMLParser,decoder.BaseDecoder):
         try:
             value = int(self.data)
         except ValueError:
-            value = long(self.data)
+            value = int(self.data)
         self.end_value(value)
 
     def start_float(self, attributes):
@@ -163,7 +167,7 @@ class AtlasParser(XMLParser,decoder.BaseDecoder):
 def string2object(string):
     """convert a string of one entity into an object"""
     #make a parser
-    parse = get_parser()
+    parse = xml2.get_parser()
 
     parse("<atlas>")
     return parse(string)[0]

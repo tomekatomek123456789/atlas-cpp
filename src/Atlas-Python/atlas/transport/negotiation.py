@@ -44,10 +44,12 @@
 #neg.other_codecs: list of codecs other side supports
 #neg.other_id: id -string of other side
 
+from builtins import object
 import string
 import atlas.codecs
+from atlas import typesx
 
-class Negotiation:
+class Negotiation(object):
     state_done = 0
     state_id = "id"
     state_negotiation = "negotiation"
@@ -99,30 +101,30 @@ class Negotiation:
         return self.result_code
 
     def process_line(self, line):
-        raise AttributeError, "User NegotiationClient or NegotiationServer instead"
+        raise AttributeError("User NegotiationClient or NegotiationServer instead")
 
     def collect_until_newline(self):
         if self.fp:
-            ok = string.find(self.str, "\n")<0
+            ok = typesx.find(self.str, "\n")<0
             while ok:
                 ok = read_str = self.fp.recv(1) # silence-py depends on this /Demitar
                 self.str = self.str + read_str
-                ok = read_str and string.find(self.str, "\n")<0
+                ok = read_str and typesx.find(self.str, "\n")<0
         #print "neg:cun", `self.str`
-        newline_pos = string.find(self.str, "\n")
+        newline_pos = typesx.find(self.str, "\n")
         if newline_pos >= 0:
             res = self.str[:newline_pos]
             self.str = self.str[newline_pos+1:]
             return res
 
     def iwill(self, codecs):
-        return string.join(map(lambda c:"IWILL %s\n" % c, codecs), "") + '\n' # Fixes negotiation /Demitar
+        return typesx.join(["IWILL %s\n" % c for c in codecs], "") + '\n' # Fixes negotiation /Demitar
 
     def ican(self, codecs):
-        return string.join(map(lambda c:"ICAN %s\n" % c, codecs), "") + '\n' # Fixes negotiation /Demitar
+        return typesx.join(["ICAN %s\n" % c for c in codecs], "") + '\n' # Fixes negotiation /Demitar
 
     def analyse_line_codecs(self, line):
-        modes = string.split(line)
+        modes = typesx.split(line)
         if len(modes)>=2 and modes[0]=="ICAN":
             self.other_codecs.append(modes[1])
         return modes

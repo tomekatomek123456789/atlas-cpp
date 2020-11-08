@@ -16,11 +16,10 @@
 #License along with this library; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-
+from importlib import reload
 import atlas
 reload(atlas)
 from atlas import *
-
 lst_simple = [Object(j=7), [5.2, "87"]]
 obj_simple = Object(i=3, fl=-42.8, hello="Hello world!")
 human_class = Object(id="human", objtype="class", parents=["living"], description="Humans have two foots")

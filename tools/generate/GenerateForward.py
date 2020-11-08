@@ -6,12 +6,13 @@
 # just used to partition gen_cpp.py into files,
 # not usable without GenerateCC class
 
+from builtins import object
 __revision__ = '$Id$'
 
 from common import *
 
 
-class GenerateForward:
+class GenerateForward(object):
     def generate_forward(self, objects):
         self.generate_forward_interface(objects)
 

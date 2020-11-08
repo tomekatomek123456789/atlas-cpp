@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 #Packed parser and generator
 #see forge/protocols/atlas/spec/packed_syntax.html
 
@@ -18,10 +19,15 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from builtins import str
+from builtins import hex
+from builtins import chr
+from future.utils import raise_
 import string
 from atlas import Object, Messages
 from atlas.typemap import *
-import encoder, decoder
+from atlas import typesx
+from . import encoder, decoder
 
 special_characters = "+[]()@#$=\n\r"
 
@@ -34,7 +40,7 @@ class Encoder(encoder.BaseEncoder):
     empty_end_string = ""
     
     def encode1stream(self, object):
-        return string.join(to_string_and_type(object), "") + "\n"
+        return typesx.join(to_string_and_type(object), "") + "\n"
 
     encode1 = encode1stream
 
@@ -77,10 +83,10 @@ def map2packed(obj):
     """this encodes mappings"""
     str_list = []
     add_item = str_list.append
-    for name, value in obj.items():
+    for name, value in list(obj.items()):
         type_str, str_value, end_type = to_string_and_type(value)
         add_item('%s%s=%s%s' % (type_str, name, str_value, end_type))
-    return string.join(str_list, "")
+    return typesx.join(str_list, "")
 
 def list2packed(lst):
     str_list = []
@@ -88,7 +94,7 @@ def list2packed(lst):
     for item in lst:
         type_str, str_value, end_type = to_string_and_type(item)
         add_item('%s%s%s' % (type_str, str_value, end_type))
-    return string.join(str_list,"")
+    return typesx.join(str_list,"")
 
 
 ############################################################
@@ -118,7 +124,7 @@ class PackedParser(decoder.BaseDecoder):
             elif self.quote_on:
                 self.quote_data = self.quote_data + ch
                 if ch not in string.digits + "abcdef":
-                    raise PackedException, "Illegal character in quoted string" + ch
+                    raise_(PackedException, "Illegal character in quoted string" + ch)
                 if len(self.quote_data)==2:
                     self.data = self.data + chr(eval("0x" + self.quote_data))
                     self.quote_on = 0
@@ -144,12 +150,12 @@ class PackedParser(decoder.BaseDecoder):
         name = self.name_stack.pop()
         if name:
             if not isinstance(obj,Object):
-                raise PackedException, "attribute outside mapping (%s:%s)!" % \
-                      (name, value)
+                raise_(PackedException, "attribute outside mapping (%s:%s)!" % \
+                      (name, value))
             setattr(obj, name, value)
         else:
-            if type(obj)!=ListType:
-                raise PackedException, "value mapping list (%s)!" % value
+            if type(obj)!=typesx.ListType:
+                raise_(PackedException, "value mapping list (%s)!" % value)
             obj.append(value)
 
     def push_value(self, initial_value):

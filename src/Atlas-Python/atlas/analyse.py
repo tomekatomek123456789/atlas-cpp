@@ -1,3 +1,4 @@
+from __future__ import print_function
 #various analysis/attribute filling for atlas objects
 
 #Copyright (C) 2000 by Aloril
@@ -18,12 +19,17 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from builtins import str
+from builtins import range
+from future.utils import raise_
+from builtins import object
 import string
 from types import *
 import atlas
 from atlas.typemap import get_atlas_type
+import typesx
 
-class Analyse:
+class Analyse(object):
     """fill attributes"""
     def __init__(self, objects):
         self.objects = objects
@@ -32,7 +38,7 @@ class Analyse:
     def syntax_error(self, msg, obj):
         #info = obj.specification_file
         #raise SyntaxError, "%s at %s:%s" % (msg, info.filename, info.lineno)
-        raise SyntaxError, "%s for %s" % (msg, obj)
+        raise_(SyntaxError, "%s for %s" % (msg, obj))
 
     def check_fill(self):
         """fill missing attributes and check for attribute definitions"""
@@ -49,7 +55,7 @@ class Analyse:
             except AttributeError:
                 self.syntax_error(
                     "Id attribute is not specified for object", obj)
-            if self.id_dict.has_key(id):
+            if id in self.id_dict:
                 self.syntax_error(
                     'Object with "'+id+'"-id already exists', obj)
             self.id_dict[id]=obj
@@ -66,7 +72,7 @@ class Analyse:
             obj.children=[]
         for obj in self.objects:
             pid = obj.parent
-            if type(pid)==StringType:
+            if type(pid)==typesx.StringType:
                 try:
                     parent_obj = self.id_dict[pid]
                 except KeyError:
@@ -77,11 +83,11 @@ class Analyse:
 
     def check_type_object(self, obj):
         """recursively check types for all objects"""
-        if type(obj)==ListType or isinstance(obj, atlas.Messages):
+        if type(obj)==typesx.ListType or isinstance(obj, atlas.Messages):
             for sub_obj in obj:
                 self.check_type_object(sub_obj)
-        elif type(obj)==InstanceType:
-            for name, value in obj.items():
+        elif type(obj)==typesx.InstanceType:
+            for name, value in list(obj.items()):
                 try:
                     type_obj = self.id_dict[name]
                 except KeyError:
@@ -102,7 +108,7 @@ def fill_attributes(objects):
     an.check_fill()
     return an
 
-class Link:
+class Link(object):
     def __init__(self, name):
         self.name = name
         self.direction1 = {}
@@ -110,7 +116,7 @@ class Link:
         self.verbose = 0
 
     def get_dict(self, name, dict):
-        return dict.get(name, {}).keys()
+        return list(dict.get(name, {}).keys())
 
     def get1(self, name):
         return self.get_dict(name, self.direction1)
@@ -127,30 +133,30 @@ class Link:
         self.add_dict(self.direction1, name1, name2)
         self.add_dict(self.direction2, name2, name1)
         if self.verbose:
-            print "%s.add_dict: %s <-> %s" % (self.name, name1, name2)
+            print("%s.add_dict: %s <-> %s" % (self.name, name1, name2))
 
     def copy(self, dest, source):
         if self.verbose:
-            print "%s.copy: %s <- %s" % (self.name, dest, source)
-        for name2 in self.direction1.get(source, {}).keys():
+            print("%s.copy: %s <- %s" % (self.name, dest, source))
+        for name2 in list(self.direction1.get(source, {}).keys()):
             self.add(dest, name2)
 
     def remove_dict(self, name, dict1, dict2):
         entry = dict1.get(name)
         if entry!=None:
-            for name2 in entry.keys():
+            for name2 in list(entry.keys()):
                 del dict2[name2][name]
                 if not dict2[name2]: del dict2[name2]
                 if self.verbose:
-                    print "%s.remove_dict: %s <-> %s" % (self.name, name, name2)
+                    print("%s.remove_dict: %s <-> %s" % (self.name, name, name2))
             del dict1[name]
 
     def remove(self, name):
         if self.verbose:
-            print "%s.remove: %s" % (self.name, name)
-        if self.direction1.has_key(name):
+            print("%s.remove: %s" % (self.name, name))
+        if name in self.direction1:
             self.remove_dict(name, self.direction1, self.direction2)
-        if self.direction2.has_key(name):
+        if name in self.direction2:
             self.remove_dict(name, self.direction2, self.direction1)
 
     #this code not used, but ... it should be ok: if you need it, uncomment it
@@ -174,15 +180,15 @@ class Link:
 
     def repr_dict(self, name, dict):
         slst = []
-        for key, value in dict.items():
-            slst.append(key + ": " + str(value.keys()))
-        return name + "(" + string.join(slst, ", ") + ")"
+        for key, value in list(dict.items()):
+            slst.append(key + ": " + str(list(value.keys())))
+        return name + "(" + typesx.join(slst, ", ") + ")"
     def __repr__(self):
         return self.name + "(" + self.repr_dict("Direction1", self.direction1) + ", " + \
                self.repr_dict("Direction2", self.direction2) + ")"
 
 
-class Resolver:
+class Resolver(object):
     bidirectional_attributes = {"loc":"contains", "parent":"children"} #currently only "loc" works
     def __init__(self, objects):
         self.verbose = 0
@@ -193,32 +199,32 @@ class Resolver:
 
     def check_bidirectiontal(self, obj, attr):
         #CHEAT: only "loc"->"contains" really works
-        if self.bidirectional_attributes.has_key(attr):
+        if attr in self.bidirectional_attributes:
             if self.verbose:
-                print "bidirectional_attributes:", obj.id, attr
+                print("bidirectional_attributes:", obj.id, attr)
             attr_value_lst = getattr(obj, attr)
             if hasattr(attr_value_lst, "items"): attr_value_lst = [attr_value_lst]
             for attr_value in attr_value_lst:
                 other = getattr(attr_value, self.bidirectional_attributes[attr])
                 for value in other:
-                    if type(value)==StringType:
+                    if type(value)==typesx.StringType:
                         if obj.id==value: return
                     else:
                         if obj.id==value.id: return
-                print "... adding to", other, attr_value.id
+                print("... adding to", other, attr_value.id)
                 other.append(obj)
 
     def new_object(self, obj):
         ok_objects = {}
         if self.verbose:
-            print "-"*60
-            print "new_object:", obj.id
+            print("-"*60)
+            print("new_object:", obj.id)
         for pointer in self.pending.get1(obj.id):
             if self.verbose:
-                print "pointer:", pointer
+                print("pointer:", pointer)
             obj2, id = atlas.resolve_pointer2(self.objects, pointer)
             #obj2[id] = obj
-            if type(obj2[id])==StringType:
+            if type(obj2[id])==typesx.StringType:
                 obj2[id] = atlas.resolve_pointer(self.objects, obj2[id])
             self.check_bidirectiontal(obj2, id)
             self.links.add(obj.id, pointer)
@@ -226,65 +232,65 @@ class Resolver:
             self.depencies.remove(pointer)
             for other_id in other_id_lst:
                 if self.verbose:
-                    print "other_id:", other_id
+                    print("other_id:", other_id)
                 self.depencies.copy(other_id, obj.id)
                 if not self.depencies.get1(other_id):
                     if self.verbose:
-                        print "!!", other_id
+                        print("!!", other_id)
                     ok_objects[other_id] = self.objects[other_id]
         self.pending.remove(obj.id)
 
         if self.depencies.get1(obj.id):
             if self.verbose:
-                print "not ok!"
+                print("not ok!")
         else:
             if self.verbose:
-                print "ok!"
+                print("ok!")
             ok_objects[obj.id] = self.objects[obj.id]
         if self.verbose:
-            print "===> ok_objects:", obj.id, ok_objects.keys()
-            print "!!!>", self.pending
-            print "???>", self.depencies
+            print("===> ok_objects:", obj.id, list(ok_objects.keys()))
+            print("!!!>", self.pending)
+            print("???>", self.depencies)
             #print self.links
-            print "="*60
-            for i in range(4): print
+            print("="*60)
+            for i in range(4): print()
             import sys
             sys.stdout.flush()
-        return ok_objects.values()
+        return list(ok_objects.values())
 
     def resolve_attribute(self, obj, attr):
         unresolved = []
         #add object to dictionary of all objects
         base_id = obj.id #atlas.get_base_id(obj.id)
         if self.verbose:
-            print "base_id:", base_id
-        if self.objects.has_key(base_id):
+            print("base_id:", base_id)
+        if base_id in self.objects:
             obj = self.objects[base_id]
             if self.verbose:
-                print "got it"
+                print("got it")
         else:
             self.objects[base_id] = obj
             if self.verbose:
-                print "adding it"
+                print("adding it")
         if not hasattr(obj, attr): return unresolved
         #resolve id
         value = getattr(obj, attr)
         if self.verbose:
-            print "going to recursive.."
+            print("going to recursive..")
         return self.resolve_attribute_recursively(obj, value, base_id + "." + attr)
 
     def resolve_attribute_recursively(self, obj, value, base_id):
         unresolved = []
-        if type(value)==StringType:
+        if type(value)==typesx.StringType:
             if value=='': return unresolved
             this_id = atlas.get_base_id(base_id)
             other_id = atlas.get_base_id(value)
-            if self.objects.has_key(other_id):
+            if other_id in self.objects:
                 #pointer resolved, but all depencies still might not be resolved for this to be ok...
                 key = atlas.get_last_part(base_id)
-                if type(obj)==ListType: key = int(key)
+                if type(obj)==typesx.ListType: key = int(key)
                 if self.verbose:
-                    print "!!", str(obj)[:100], value, base_id, key, atlas.resolve_pointer(self.objects, value)
+                    print("!!", str(obj)[:100], value, base_id, key, atlas.resolve_pointer(self.objects, value))
                 self.depencies.copy(this_id, other_id)
                 obj[key] = atlas.resolve_pointer(self.objects, value)
                 self.check_bidirectiontal(obj, key)
@@ -293,40 +299,40 @@ class Resolver:
             else:
                 #pointer not resolved, record needed info for later resolving:
                 if self.verbose:
-                    print "??", str(obj)[:70], base_id, this_id, value, other_id
+                    print("??", str(obj)[:70], base_id, this_id, value, other_id)
                 unresolved.append(other_id)
                 
                 #1) add value into "what pointers other_id object can resolve" -dictionary
                 self.pending.add(other_id, base_id)
                 if self.verbose:
-                    print self.pending
+                    print(self.pending)
                 
                 #2) what pointers need to be resolved for this object
                 self.depencies.add(this_id, base_id)
                 if self.verbose:
-                    print self.depencies
+                    print(self.depencies)
 
                 return unresolved
-        elif type(value)==ListType:
+        elif type(value)==typesx.ListType:
             if self.verbose:
-                print "list:", base_id
+                print("list:", base_id)
             for i in range(len(value)):
                 value2 = value[i]
                 res = self.resolve_attribute_recursively(value, value2, "%s.%s" % (base_id, i))
                 if res: unresolved = unresolved + res
             return unresolved
-        elif type(value)==DictType or \
-             (type(value)==InstanceType and hasattr(value, "items") and not hasattr(value, "id")):
+        elif type(value)==typesx.DictType or \
+             (type(value)==typesx.InstanceType and hasattr(value, "items") and not hasattr(value, "id")):
             if self.verbose:
-                print "dict:", base_id
-            for key, value2 in value.items():
+                print("dict:", base_id)
+            for key, value2 in list(value.items()):
                 res = self.resolve_attribute_recursively(value, value2, "%s.%s" % (base_id, key))
                 if res: unresolved = unresolved + res
             return unresolved
         #ignore unknown types (like Vector3D)
         if self.verbose:
-            print "this type (%s) not handled yet (%s)..." % (type(value), value)
-            if type(value)==InstanceType:
-                print "class:", value.__class__, value.__class__.__bases__
+            print("this type (%s) not handled yet (%s)..." % (type(value), value))
+            if type(value)==typesx.InstanceType:
+                print("class:", value.__class__, value.__class__.__bases__)
         #raise ValueError, "this type (%s) not handled yet (%s)..." % (type(value), value)
         return unresolved

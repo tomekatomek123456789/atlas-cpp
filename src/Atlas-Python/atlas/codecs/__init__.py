@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 #codec factory, list of codecs, etc..
 
 #Copyright (C) 2000,2001 by Aloril
@@ -29,14 +30,15 @@
 #to decode string (returns list of decodec objects)
 #obj_list = codec.decode(some_string)
 
-import xml
-import xml2
-import packed
-import binary1
-import binary2
-import bach
+from builtins import object
+from . import xml
+from . import xml2
+from . import packed
+from . import binary1
+from . import binary2
+from . import bach
 
-class Codec:
+class Codec(object):
     def __init__(self, id, decoder, encoder):
         self.id = id
         self.decoder = decoder
@@ -51,13 +53,13 @@ class Codec:
         self.decoder.set_stream_mode(mode)
         self.encoder.set_stream_mode(mode)
 
-class CodecFactory: 
+class CodecFactory(object): 
     def __init__(self, id, decoder_factory, encoder_factory):
         self.id = id
         self.decoder_factory = decoder_factory
         self.encoder_factory = encoder_factory
     def __call__(self):
-        return apply(Codec, (self.id, self.decoder_factory(),
+        return Codec(*(self.id, self.decoder_factory(),
                              self.encoder_factory()))
 
 factory_list = [

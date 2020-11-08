@@ -17,18 +17,20 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from builtins import str
 import select, socket, string
 from atlas.transport.negotiation import NegotiationClient
 from atlas.transport.bridge import Bridge
 from atlas.transport.TCP.connection import TcpConnection
 from atlas.transport.connection import Loop
 from atlas.util.debug import debug
+from atlas import typesx
 
 
 class TcpClient(TcpConnection,Loop):
     """don't use this class directly: derive from it and
        implemnt all needed foo_op -methods"""
-    def __init__(self, name, (host, port)):
+    def __init__(self, name, host , port):
         self.name = name
         self.host = host
         self.port = port
@@ -49,9 +51,9 @@ class TcpClient(TcpConnection,Loop):
 
     def process_communication(self):
         fd_in = [self.socket]
-        debug("Selecting: " + str(map(lambda s: s.fileno(), fd_in)))
+        debug("Selecting: " + str([s.fileno() for s in fd_in]))
         ready = select.select(fd_in,[],[], 0)
         ready_in = ready[0]
         if not ready_in: return
-        debug("Ready: " + string.replace(str(map(lambda s: s.fileno(), ready[0]+ready[1]+ready[2])),"\n", "\\n"))
+        debug("Ready: " + typesx.replace(str([s.fileno() for s in ready[0]+ready[1]+ready[2]]),"\n", "\\n"))
         self.recv()

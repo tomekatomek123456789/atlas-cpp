@@ -1,3 +1,4 @@
+from __future__ import print_function
 #base class for connections
 
 #Copyright 2001,2002 by Aloril
@@ -17,8 +18,11 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import string, traceback, time
-from StringIO import StringIO
+from io import StringIO
 import atlas
 from atlas.util.debug import debug
 
@@ -29,11 +33,11 @@ def args2address(args):
         host="localhost"
     try:
         port=int(args[2])
-    except IndexError, ValueError:
+    except IndexError as ValueError:
         port=6767
     return host, port
 
-class BaseConnection:
+class BaseConnection(object):
     def setup(self):
         pass
 
@@ -57,10 +61,10 @@ class BaseConnection:
         self.send_operation(reply_op)
 
     def error_op(self, op):
-        print "Got error operation (override method from connection.py"
-        print "to define your own error handling: this is here so you don't"
-        print "accidentally echo error operations back and potentially form a loop):"
-        print op
+        print("Got error operation (override method from connection.py")
+        print("to define your own error handling: this is here so you don't")
+        print("accidentally echo error operations back and potentially form a loop):")
+        print(op)
 
     def send_error(self, op, msg):
         err = atlas.Object(message=msg, op=op)
@@ -103,7 +107,7 @@ class BaseConnection:
 
 
 
-class Loop:
+class Loop(object):
     def loop(self, loop_max=-1):
         loop_count = 0
         while loop_max<0 or loop_count<loop_max:

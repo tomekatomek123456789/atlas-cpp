@@ -1,3 +1,4 @@
+from __future__ import division
 #Vector3D class
 
 #Copyright (C) 1999 by Kosh
@@ -17,7 +18,13 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
-from types import * #for TypeXXX
+from past.builtins import cmp
+from builtins import map
+from future.utils import raise_
+from builtins import object
+from past.utils import old_div
+from types import * #for TypeXXX , in python 3 cannot work
+from atlas import typesx #for python 2 TypeXXX compatibility
 from operator import * #for add, etc..
 from math import *
 
@@ -25,9 +32,10 @@ class Vector3D:
         """Make a vector from a list or from all three values, if the lenght
         of the list is less then 3 then the rest of the values are filled 
         with zeros."""
+
         def __init__(self, x, y=None, z=None):
                 "Check to see if x is a list"
-                if type(x)==ListType:
+                if type(x)==typesx.ListType:
                         #If the lenght of the list is less then 3 fill with 0"
                         if len(x)<3:
                                 x=x+[0.0]*(3-len(x))
@@ -42,23 +50,23 @@ class Vector3D:
 
         def __add__(self, other):
                 "Add two vectors"
-                return Vector3D(map(add,self.vector,other.vector))
+                return Vector3D(list(map(add,self.vector,other.vector)))
 
         def __sub__(self, other):
                 "Subtract two vectors"
-                return Vector3D(map(sub,self.vector,other.vector))
+                return Vector3D(list(map(sub,self.vector,other.vector)))
 
         def __mul__(self, other):
                 "Multpiply one vector by another vector or by a number"
-                if type(other) == InstanceType:
+                if type(other) == typesx.InstanceType:
                         o_vector=other.vector
                 else:
                         o_vector=[other]*3
-                return Vector3D(map(mul,self.vector,o_vector))
+                return Vector3D(list(map(mul,self.vector,o_vector)))
 
         def __div__(self, other):
                 "Divide a vector by a number"
-                return Vector3D(map(div,self.vector,[other]*3))
+                return Vector3D(list(map(typesx.div,self.vector,[other]*3)))
 
         def __getitem__(self, index):
                 "Get a value from a vector given by index"
@@ -81,7 +89,7 @@ class Vector3D:
                 if name=="x": return self.vector[0]
                 if name=="y": return self.vector[1]
                 if name=="z": return self.vector[2]
-                raise AttributeError, name
+                raise_(AttributeError, name)
 
         def __setattr__(self, name, value):
                 "Set the value of a vector by name"
@@ -92,13 +100,13 @@ class Vector3D:
 
         def __repr__(self):
                 "String representation of a vector"
-                return 'Vector3D' + `(self.x, self.y, self.z)`
+                return 'Vector3D' + repr((self.x, self.y, self.z))
 
         def __neg__(self):
                 "The negative of a vector"
-                return Vector3D(map(neg,self.vector))
+                return Vector3D(list(map(neg,self.vector)))
 
-        def __nonzero__(self):
+        def __bool__(self):
                 "Check for nonzero vector"
                 return not (self.x==self.y==self.y==0.0)
  
@@ -131,19 +139,19 @@ class Vector3D:
         def angle(self, v):
                 "Find the angle between two vectors"
                 d = v.x * self.x + v.y * self.y + v.z * self.z
-                return d / (v.mag() * u.mag())
+                return old_div(d, (v.mag() * self.mag()))
 
         def unit_vector(self):
-        	"return the unit vector of a vector"
-        	try:
-			return self/self.mag()
-		except ZeroDivisionError:
-			return Vector3D([0.0,0.0,0.0])
-        	
+                "return the unit vector of a vector"
+                try:
+                        return old_div(self,self.mag())
+                except ZeroDivisionError:
+                        return Vector3D([0.0,0.0,0.0])
+                
         def unit_vector_to_another_vector(self, v):
-        	"return the unit vector in the direction of another vector"
-        	difference_vector = v - self
-        	return difference_vector.unit_vector()
+                "return the unit vector in the direction of another vector"
+                difference_vector = v - self
+                return difference_vector.unit_vector()
 
         def mag(self):
                 "Find the magnitude of a vector"

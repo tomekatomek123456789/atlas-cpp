@@ -9,7 +9,7 @@
 
 #include <string>
 
-/** The Atlas namespace.
+/** The Atlas namespace..
 
 This namespace contains the whole of the Atlas-C++ library, and which is
 divided into a hierarchy of other namespaces. The main namespaces of

@@ -3,7 +3,7 @@ from conans import ConanFile, CMake
 
 class AtlasConan(ConanFile):
     name = "atlas"
-    version = "0.7.0"
+    version = "0.7.2"
     license = "GPL-2.0+"
     author = "Erik Ogenvik <erik@ogenvik.org>"
     homepage = "https://www.worldforge.org"

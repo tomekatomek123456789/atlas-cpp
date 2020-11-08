@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 #XML codec
 
 #Copyright 2001 by Aloril
@@ -17,5 +18,5 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
-from gen_xml import get_encoder
-from parse_xml import get_decoder
+from .gen_xml import get_encoder
+from .parse_xml import get_decoder

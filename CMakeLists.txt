@@ -47,8 +47,8 @@ find_package(BZip2)
 find_package(ZLIB)
 
 
-find_package(PythonInterp 2.7)
-cmake_dependent_option(ATLAS_GENERATE_OBJECTS "Generate Atlas Object classes from Atlas defs" TRUE "PYTHONINTERP_FOUND" FALSE)
+find_package(Python3 COMPONENTS Interpreter Development)
+cmake_dependent_option(ATLAS_GENERATE_OBJECTS "Generate Atlas Object classes from Atlas defs" TRUE "PYTHONINTERP_FOUND " FALSE)
 option(ATLAS_DISABLE_BENCHMARKS "Disable benchmarks." FALSE)
 
 # This macro defines a library
@@ -107,7 +107,7 @@ if (ATLAS_GENERATE_OBJECTS)
             VERBATIM
             )
 else (ATLAS_GENERATE_OBJECTS)
-    if (NOT PYTHONINTERP_FOUND)
+    if (NOT Python3_Interpreter_FOUND)
         message("Could not find any suitable Python environment. This just means that the automatic code generation features won't be available. Unless you plan on changing the protocol this should not be an issue.")
     endif()
 endif (ATLAS_GENERATE_OBJECTS)

@@ -18,14 +18,16 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from builtins import map
 import init
 import operator
 from atlas.analyse import fill_attributes
 from atlas.transport.file import read_file, write_file
+from functools import reduce
 
 if __name__=="__main__":
     filelist = ["root", "entity", "operation", "type"]
-    filelist = map(lambda file:file+".atlas", filelist)
-    objects = reduce(operator.add, map(read_file, filelist))
+    filelist = [file+".atlas" for file in filelist]
+    objects = reduce(operator.add, list(map(read_file, filelist)))
     fill_attributes(objects)
     write_file(objects, "atlas.atlas")

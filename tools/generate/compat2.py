@@ -1,5 +1,8 @@
+from __future__ import division
 
-class _C:
+from past.utils import old_div
+from builtins import object
+class _C(object):
     def _m(self): pass
 
 
@@ -28,7 +31,7 @@ def cmp(x, y):
 
 
 def div(a, b):
-    return a/b
+    return old_div(a,b)
 
 def find(s, *args):
     """find(s, sub [,start [,end]]) -> in
@@ -65,18 +68,6 @@ def replace(s, old, new, maxreplace=-1):
     given, only the first maxreplace occurrences are replaced.
     """
     return s.replace(old, new, maxreplace)
-
-def upper(s):
-    """upper(s) -> string
-    Return a copy of the string s converted to uppercase.
-    """
-    return s.upper()
-
-def lower(s):
-    """lower(s) -> string
-    Return a copy of the string s converted to lowercase.
-    """
-    return s.lower()
 
 #Declarations compatibility 
 lowercase = 'abcdefghijklmnopqrstuvwxyz'
